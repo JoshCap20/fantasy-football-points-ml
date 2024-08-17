@@ -1,5 +1,7 @@
 import pandas as pd
-import logging
+from logger import get_logger
+
+logging = get_logger(__name__)
 
 
 def load_and_process_data(file_name: str) -> pd.DataFrame:
