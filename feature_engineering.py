@@ -2,12 +2,18 @@ import pandas as pd
 
 
 def get_game_char_indicators(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
-    df["home"] = (df["h/a"] == "h").astype(int)
-    df = pd.concat([df, pd.get_dummies(df["Oppt"], prefix="Oppt")], axis=1)
-    df = pd.concat([df, pd.get_dummies(df["Team"], prefix="Team")], axis=1)
+    df["home"] = (df["recent_team"] == df["home_team"]).astype(int)
+
+    # Create one-hot encoding for the opponent and team
+    df = pd.concat([df, pd.get_dummies(df["opponent_team"], prefix="Oppt")], axis=1)
+    df = pd.concat([df, pd.get_dummies(df["recent_team"], prefix="Team")], axis=1)
+
     game_features = (
-        ["home"] + list(df.filter(regex="^Oppt_")) + list(df.filter(regex="^Team_"))
+        ["home"]
+        + list(df.filter(regex="^Oppt_").columns)
+        + list(df.filter(regex="^Team_").columns)
     )
+
     return df, game_features
 
 
@@ -25,17 +31,17 @@ def get_player_averages(
     feature_names = []
     for stat in stats:
         season_stat = (
-            df.groupby("playerID")[stat]
+            df.groupby("player_id")[stat]
             .apply(lambda x: rolling_average(x, 16))
             .reset_index(level=0, drop=True)
         )
         recent_stat = (
-            df.groupby("playerID")[stat]
+            df.groupby("player_id")[stat]
             .apply(lambda x: rolling_average(x, 4))
             .reset_index(level=0, drop=True)
         )
         prev_stat = (
-            df.groupby("playerID")[stat]
+            df.groupby("player_id")[stat]
             .apply(lambda x: rolling_average(x, 1))
             .reset_index(level=0, drop=True)
         )
@@ -51,23 +57,41 @@ def get_player_averages(
 
 def create_features(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
     stats = [
-        "pass.att",
-        "pass.comp",
-        "passyds",
-        "pass.tds",
-        "pass.ints",
-        "rush.att",
-        "rushyds",
-        "rushtds",
-        "recept",
-        "recyds",
-        "rec.tds",
-        "kick.rets",
-        "punt.rets",
-        "fgm",
-        "xpmade",
-        "totalfumbs",
+        "attempts",
+        "completions",
+        "passing_yards",
+        "passing_tds",
+        "interceptions",
+        "carries",
+        "rushing_yards",
+        "rushing_tds",
+        "receptions",
+        "targets",
+        "receiving_yards",
+        "receiving_tds",
+        "special_teams_tds",
+        "rushing_fumbles",
+        "receiving_fumbles",
+        "sack_fumbles",
     ]
+    # stats = [
+    #     "pass.att",
+    #     "pass.comp",
+    #     "passyds",
+    #     "pass.tds",
+    #     "pass.ints",
+    #     "rush.att",
+    #     "rushyds",
+    #     "rushtds",
+    #     "recept",
+    #     "recyds",
+    #     "rec.tds",
+    #     "kick.rets",
+    #     "punt.rets",
+    #     "fgm",
+    #     "xpmade",
+    #     "totalfumbs",
+    # ]
     df, game_features = get_game_char_indicators(df)
     df, player_features = get_player_averages(df, stats)
     return df, game_features + player_features

@@ -4,11 +4,10 @@ import pandas as pd
 import seaborn as sns
 from sklearn.model_selection import learning_curve
 
+
 class FantasyFootballAnalysis:
     def __init__(self, path="results/"):
         self.path = path
-        self.pred = pd.read_csv(self.path + "position_rmse.csv")
-        self.fantasy = pd.read_csv(self.path + "fantasy_rmse.csv")
         self.df = pd.read_csv(self.path + "position_rmse.csv")
         self.df.set_index("Model", inplace=True)
         self.base_models = sorted(set(model.split("_")[0] for model in self.df.index))
@@ -27,44 +26,13 @@ class FantasyFootballAnalysis:
     def find_best_estimator(self):
         min_rmse_by_position = {}
         print("The best estimator for each position with the lowest RMSE is:\n")
-        for position in self.pred.columns[1:]:
-            min_rmse = self.pred[position].min()
-            min_rmse_index = self.pred[position].idxmin()
-            min_rmse_algo = self.pred.iloc[min_rmse_index, 0]
+        for position in self.df.columns[1:]:
+            min_rmse = self.df[position].min()
+            min_rmse_index = self.df[position].idxmin()
+            min_rmse_algo = self.df.iloc[min_rmse_index, 0]
             min_rmse_by_position[position] = min_rmse
             print(f"{position}: {min_rmse_algo} with RMSE: {min_rmse:.3f}")
         return min_rmse_by_position
-
-    def compare_rmse(self, min_rmse_by_position):
-        Fantasy_RMSE = []
-        for position in self.pred.columns[1:]:
-            Fantasy_RMSE.append(
-                float(self.fantasy.loc[self.fantasy["Pos"] == position, "diff"].values[0])
-            )
-
-        positions = self.pred.columns[1:]
-        ind = np.arange(len(positions))
-        width = 0.35
-
-        fig, ax = plt.subplots(figsize=(12, 6))
-        rects1 = ax.bar(
-            ind, list(min_rmse_by_position.values()), width, color="r", label="Prediction"
-        )
-        rects2 = ax.bar(ind + width, Fantasy_RMSE, width, color="y", label="Fantasydata.com")
-
-        ax.set_ylabel("RMSE")
-        ax.set_ylim([0, 13])
-        ax.set_title("RMSE Comparison by Position")
-        ax.set_xticks(ind + width / 2)
-        ax.set_xticklabels(positions)
-        ax.legend()
-
-        self.autolabel(rects1, ax)
-        self.autolabel(rects2, ax)
-
-        plt.tight_layout()
-        plt.savefig(self.path + "fantasy_rmse_comparison_by_position.png", dpi=300)
-        plt.show()
 
     def plot_rmse_by_model_and_position(self):
         num_positions = len(self.df.columns)
@@ -95,21 +63,21 @@ class FantasyFootballAnalysis:
                     values[0],
                     width,
                     color=colors["train"],
-                    label="Train"if i == 0 else "",
+                    label="Train" if i == 0 else "",
                 )
                 rects_test = ax.bar(
                     ind[i],
                     values[1],
                     width,
                     color=colors["test"],
-                    label="Test"if i == 0 else "",
+                    label="Test" if i == 0 else "",
                 )
                 rects_cv = ax.bar(
                     ind[i] + width,
                     values[2],
                     width,
                     color=colors["cv"],
-                    label="CV"if i == 0 else "",
+                    label="CV" if i == 0 else "",
                 )
 
                 self.autolabel(rects_train, ax)
@@ -132,20 +100,22 @@ class FantasyFootballAnalysis:
     def plot_rmse_distribution(self):
         boxplot_data = []
         for base_model in self.base_models:
-            for metric in ['train_rmse', 'test_rmse', 'cv_rmse']:
-                boxplot_data.append({
-                    "Model": base_model,
-                    "Metric": metric,
-                    "RMSE": self.df.loc[f"{base_model}_{metric}", :].values
-                })
+            for metric in ["train_rmse", "test_rmse", "cv_rmse"]:
+                boxplot_data.append(
+                    {
+                        "Model": base_model,
+                        "Metric": metric,
+                        "RMSE": self.df.loc[f"{base_model}_{metric}", :].values,
+                    }
+                )
 
         boxplot_df = pd.DataFrame(boxplot_data)
         plt.figure(figsize=(14, 8))
-        sns.boxplot(x='Model', y='RMSE', hue='Metric', data=boxplot_df.explode('RMSE'))
-        plt.title('RMSE Distribution by Model and Metric')
-        plt.ylabel('RMSE')
-        plt.xlabel('Model')
-        plt.legend(loc='upper right')
+        sns.boxplot(x="Model", y="RMSE", hue="Metric", data=boxplot_df.explode("RMSE"))
+        plt.title("RMSE Distribution by Model and Metric")
+        plt.ylabel("RMSE")
+        plt.xlabel("Model")
+        plt.legend(loc="upper right")
         plt.xticks(rotation=45)
         plt.tight_layout()
         plt.savefig(self.path + "rmse_distribution_by_model.png", dpi=300)
@@ -154,28 +124,51 @@ class FantasyFootballAnalysis:
     def plot_feature_correlation_heatmap(self, train_df):
         correlation_matrix = train_df.corr()
         plt.figure(figsize=(16, 12))
-        sns.heatmap(correlation_matrix, annot=False, cmap='coolwarm', fmt='.2f')
-        plt.title('Feature Correlation Heatmap')
+        sns.heatmap(correlation_matrix, annot=False, cmap="coolwarm", fmt=".2f")
+        plt.title("Feature Correlation Heatmap")
         plt.tight_layout()
         plt.savefig(self.path + "feature_correlation_heatmap.png", dpi=300)
         plt.show()
 
-    def plot_learning_curve(self, estimator, title, X, y, cv=None, n_jobs=-1, train_sizes=np.linspace(.1, 1.0, 5)):
+    def plot_learning_curve(
+        self,
+        estimator,
+        title,
+        X,
+        y,
+        cv=None,
+        n_jobs=-1,
+        train_sizes=np.linspace(0.1, 1.0, 5),
+    ):
         plt.figure(figsize=(10, 6))
         plt.title(title)
         plt.xlabel("Training examples")
         plt.ylabel("RMSE")
 
         train_sizes, train_scores, test_scores = learning_curve(
-            estimator, X, y, cv=cv, n_jobs=n_jobs, train_sizes=train_sizes, scoring='neg_root_mean_squared_error'
+            estimator,
+            X,
+            y,
+            cv=cv,
+            n_jobs=n_jobs,
+            train_sizes=train_sizes,
+            scoring="neg_root_mean_squared_error",
         )
 
         train_scores_mean = -train_scores.mean(axis=1)
         test_scores_mean = -test_scores.mean(axis=1)
 
         plt.grid()
-        plt.plot(train_sizes, train_scores_mean, 'o-', color="r", label="Training score")
-        plt.plot(train_sizes, test_scores_mean, 'o-', color="g", label="Cross-validation score")
+        plt.plot(
+            train_sizes, train_scores_mean, "o-", color="r", label="Training score"
+        )
+        plt.plot(
+            train_sizes,
+            test_scores_mean,
+            "o-",
+            color="g",
+            label="Cross-validation score",
+        )
 
         plt.legend(loc="best")
         plt.tight_layout()
@@ -198,15 +191,15 @@ class FantasyFootballAnalysis:
 
 def main():
     analysis = FantasyFootballAnalysis()
-
-    min_rmse_by_position = analysis.find_best_estimator()
-    analysis.compare_rmse(min_rmse_by_position)
+    analysis.find_best_estimator()
+    analysis.compare_rmse()
     analysis.plot_rmse_by_model_and_position()
     analysis.plot_rmse_distribution()
-    # Assume `train_df` is the DataFrame with your features for the heatmap# 
-    # analysis.plot_feature_correlation_heatmap(train_df)# Assume `estimator`, `X`, and `y` are def ined for the learning curve# 
+    # Assume `train_df` is the DataFrame with your features for the heatmap#
+    # analysis.plot_feature_correlation_heatmap(train_df)# Assume `estimator`, `X`, and `y` are def ined for the learning curve#
     # analysis.plot_learning_curve(estimator, "ModelName", X, y)# Assume `rmse_across_years` is a dict of year: RMSE list#
     # analysis.plot_rmse_across_years(rmse_across_years)
+
 
 if __name__ == "__main__":
     main()
