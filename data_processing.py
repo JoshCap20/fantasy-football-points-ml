@@ -1,5 +1,5 @@
 import pandas as pd
-from logger import get_logger
+from utils import get_logger
 from sklearn.impute import SimpleImputer
 
 logging = get_logger(__name__)

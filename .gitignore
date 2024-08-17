@@ -4,3 +4,5 @@
 *.pyc
 
 data/unused/*
+
+.DS_Store

@@ -25,11 +25,11 @@ def train_model(
         "RandomForestRegressor": GridSearchCV(
             RandomForestRegressor(max_depth=3), param_grid={"n_estimators": [50]}, cv=5
         ),
-        "GradientBoostingRegressor": GridSearchCV(
-            GradientBoostingRegressor(max_depth=3),
-            param_grid={"n_estimators": [50], "learning_rate": [0.3]},
-            cv=5,
-        ),
+        # "GradientBoostingRegressor": GridSearchCV(
+        #     GradientBoostingRegressor(max_depth=3),
+        #     param_grid={"n_estimators": [50], "learning_rate": [0.1]},
+        #     cv=5,
+        # ),
     }
 
     df_pos_train = df_train[df_train["Pos"] == position]
