@@ -8,26 +8,18 @@ def calculate_fantasy_rmse(df: pd.DataFrame) -> pd.Series:
 
 
 def calculate_position_rmse(results: dict) -> pd.DataFrame:
-    df = pd.DataFrame(results).T
+    new_data = {"Model": [], "PK": [], "QB": [], "RB": [], "TE": [], "WR": []}
 
-    new_data = {"Model": [], "PK": [], "QB": [], "WR": [], "TE": [], "RB": []}
-    position_data = {
-        position: [] for position in new_data.keys() if position != "Model"
-    }
-
-    for position in df.index:
-        for model in df.columns:
-            rmse_dict = df.at[position, model]
-
-            for key, rmse_value in rmse_dict.items():
-                row_name = f"{model}_{key}"
+    for position in results.keys():
+        for model in results[position].keys():
+            for metric, value in results[position][model].items():
+                row_name = f"{model}_{metric}"
                 if row_name not in new_data["Model"]:
                     new_data["Model"].append(row_name)
-
-                position_data[position].append(rmse_value)
-
-    for position, values in position_data.items():
-        new_data[position] = values
+                    for pos in ["PK", "QB", "RB", "TE", "WR"]:
+                        new_data[pos].append(float("nan"))
+                idx = new_data["Model"].index(row_name)
+                new_data[position][idx] = value
 
     new_df = pd.DataFrame(new_data)
     new_df.set_index("Model", inplace=True)

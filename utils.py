@@ -3,11 +3,10 @@ Utils
 """
 
 import pandas as pd
+import logging
 
 
-def get_logger(name: str):
-    import logging
-
+def get_logger(name: str) -> logging.Logger:
     logger = logging.getLogger(name)
     logger.setLevel(logging.INFO)
 
