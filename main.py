@@ -1,10 +1,13 @@
+"""
+Entry point.
+
+Assumes data aggregation already and files data/aggregated_2015.csv and data/aggregated_2016.csv exist.
+"""
 from data_processing import load_and_process_data
 from feature_engineering import create_features
 from model_training import train_model
 from evaluation import save_results, calculate_fantasy_data_rmse
-import logging
-
-logger = logging.getLogger(__name__)
+from logger import logger
 
 def main():
     path = "data/"
