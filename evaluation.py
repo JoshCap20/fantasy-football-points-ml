@@ -15,7 +15,7 @@ class OutputManager:
         cls, results: dict[str, dict[str, float]], filename: str
     ) -> None:
         df_rmse = pd.DataFrame(results).T
-        cls._save_dataframe(df_rmse, filename)
+        cls.save_results_from_dataframe(df_rmse, filename)
 
     @classmethod
     def save_results_from_dataframe(
