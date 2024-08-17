@@ -8,7 +8,9 @@ from data_processing import load_and_process_data
 from feature_engineering import create_features
 from model_training import train_model
 from evaluation import OutputManager, calculate_fantasy_data_rmse
-from logger import logger
+from logger import get_logger
+
+logger = get_logger(__name__)
 
 
 def main():
