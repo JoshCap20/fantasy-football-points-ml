@@ -7,13 +7,21 @@ from sklearn.pipeline import make_pipeline
 from data_processing import drop_missing_values, impute_missing_values_with_zero
 import pandas as pd
 import numpy as np
+from utils import get_logger
+from xgboost import XGBRegressor
+from lightgbm import LGBMRegressor
+from sklearn.svm import SVR
+from sklearn.neural_network import MLPRegressor
 
+
+logger = get_logger(__name__)
 
 def train_model(
     df_train: pd.DataFrame, df_test: pd.DataFrame, features: list[str], position: str
 ):
-    df_train = impute_missing_values_with_zero(df_train.copy(), features)
-    df_test = impute_missing_values_with_zero(df_test.copy(), features)
+    logger.debug(f"Training with features: {features}")
+    df_train = drop_missing_values(df_train.copy(), features)
+    df_test = drop_missing_values(df_test.copy(), features)
 
 
     models = {
@@ -26,11 +34,31 @@ def train_model(
         "RandomForestRegressor": GridSearchCV(
             RandomForestRegressor(max_depth=3), param_grid={"n_estimators": [50]}, cv=5
         ),
-        # "GradientBoostingRegressor": GridSearchCV(
-        #     GradientBoostingRegressor(max_depth=3),
-        #     param_grid={"n_estimators": [50], "learning_rate": [0.1]},
+        "GradientBoostingRegressor": GridSearchCV(
+            GradientBoostingRegressor(max_depth=3),
+            param_grid={"n_estimators": [50], "learning_rate": [0.1]},
+            cv=5,
+        ),
+        "XGBoost": GridSearchCV(
+            XGBRegressor(),
+            param_grid={"n_estimators": [50, 100], "learning_rate": [0.01, 0.1, 0.3]},
+            cv=5,
+        ),
+        "LightGBM": GridSearchCV(
+            LGBMRegressor(),
+            param_grid={"n_estimators": [50, 100], "learning_rate": [0.01, 0.1, 0.3]},
+            cv=5,
+        ),
+        "SVR": GridSearchCV(
+            SVR(),
+            param_grid={"C": [0.1, 1, 10], "epsilon": [0.1, 0.2]},
+            cv=5,
+        ),
+        # "NeuralNetwork": GridSearchCV(
+        #     MLPRegressor(max_iter=1000),
+        #     param_grid={"hidden_layer_sizes": [(50,), (100,), (50, 50)], "alpha": [0.0001, 0.001]},
         #     cv=5,
-        # ),
+        # )  
     }
 
     df_pos_train = df_train[df_train["position"] == position].copy()
