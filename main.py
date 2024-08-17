@@ -3,18 +3,20 @@ Entry point.
 
 Assumes data aggregation already and files data/aggregated_2015.csv and data/aggregated_2016.csv exist.
 """
+
 from data_processing import load_and_process_data
 from feature_engineering import create_features
 from model_training import train_model
 from evaluation import save_results, calculate_fantasy_data_rmse
 from logger import logger
 
+
 def main():
     path = "data/"
     train_df = load_and_process_data(path + "aggregated_2015.csv")
     test_df = load_and_process_data(path + "aggregated_2016.csv")
     logger.info("Data loaded and processed successfully")
-    
+
     train_df, features = create_features(train_df)
     test_df, _ = create_features(test_df)
     logger.info("Features created successfully")
