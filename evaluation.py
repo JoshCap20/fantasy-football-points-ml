@@ -1,13 +1,24 @@
 import pandas as pd
 
 
-def save_results(results: dict[str, dict[str, float]], filename: str) -> None:
-    df_rmse = pd.DataFrame(results).T
-    df_rmse.to_csv(filename, header=True, index=True)
-
-
-def calculate_fantasy_data_rmse(test_df: pd.DataFrame) -> pd.Series:
-    test_df["diff"] = (test_df["proj"] - test_df["FD points"]) ** 2.0
-    FantasyData_rmse = test_df.groupby(["Pos"])["diff"].mean() ** 0.5
-    FantasyData_rmse.to_csv("FantasyData_rmse.csv", header=True, index=True)
+def calculate_fantasy_data_rmse(df: pd.DataFrame) -> pd.Series:
+    df["diff"] = (df["proj"] - df["FD points"]) ** 2.0
+    FantasyData_rmse = df.groupby(["Pos"])["diff"].mean() ** 0.5
     return FantasyData_rmse
+
+
+class OutputManager:
+    OUTPUT_DIRECTORY = "results/"
+
+    @classmethod
+    def save_results_from_dictionary(
+        cls, results: dict[str, dict[str, float]], filename: str
+    ) -> None:
+        df_rmse = pd.DataFrame(results).T
+        cls.save_results_from_dataframe(df_rmse, filename)
+
+    @classmethod
+    def save_results_from_dataframe(
+        cls, df: pd.DataFrame, filename: str, header: bool = True, index: bool = True
+    ) -> None:
+        df.to_csv(f"{cls.OUTPUT_DIRECTORY}/{filename}", header=header, index=index)

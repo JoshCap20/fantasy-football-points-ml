@@ -2,3 +2,5 @@
 .testing
 
 *.pyc
+
+data/unused/*
