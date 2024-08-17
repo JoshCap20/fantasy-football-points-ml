@@ -1,20 +1,20 @@
 import pandas as pd
 
 
-# def get_game_char_indicators(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
-#     df["home"] = (df["recent_team"] == df["home_team"]).astype(int)
+def get_game_char_indicators(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
+    df["home"] = (df["recent_team"] == df["home_team"]).astype(int)
 
-#     # Create one-hot encoding for the opponent and team
-#     df = pd.concat([df, pd.get_dummies(df["opponent_team"], prefix="Oppt")], axis=1)
-#     df = pd.concat([df, pd.get_dummies(df["recent_team"], prefix="Team")], axis=1)
+    # Create one-hot encoding for the opponent and team
+    df = pd.concat([df, pd.get_dummies(df["opponent_team"], prefix="Oppt")], axis=1)
+    df = pd.concat([df, pd.get_dummies(df["recent_team"], prefix="Team")], axis=1)
 
-#     game_features = (
-#         ["home"]
-#         + list(df.filter(regex="^Oppt_").columns)
-#         + list(df.filter(regex="^Team_").columns)
-#     )
+    game_features = (
+        ["home"]
+        + list(df.filter(regex="^Oppt_").columns)
+        + list(df.filter(regex="^Team_").columns)
+    )
 
-#     return df, game_features
+    return df, game_features
 
 
 def rolling_average(df: pd.DataFrame, window: int) -> pd.DataFrame:
@@ -25,7 +25,7 @@ def get_player_averages(
     df: pd.DataFrame, stats: list[str]
 ) -> tuple[pd.DataFrame, list[str]]:
     """
-    Estimate player averages for all stats and FanDuel point histories,
+    Estimate player averages for all stats and fantasy point histories,
     for season-to-date, last 4 weeks, and previous week
     """
     feature_names = []
@@ -74,24 +74,10 @@ def create_features(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
         "receiving_fumbles",
         "sack_fumbles",
     ]
-    # stats = [
-    #     "pass.att",
-    #     "pass.comp",
-    #     "passyds",
-    #     "pass.tds",
-    #     "pass.ints",
-    #     "rush.att",
-    #     "rushyds",
-    #     "rushtds",
-    #     "recept",
-    #     "recyds",
-    #     "rec.tds",
-    #     "kick.rets",
-    #     "punt.rets",
-    #     "fgm",
-    #     "xpmade",
-    #     "totalfumbs",
-    # ]
-    # df, game_features = get_game_char_indicators(df)
+    
+    df, game_features = get_game_char_indicators(df)
     df, player_features = get_player_averages(df, stats)
-    return df, player_features
+    
+    df.to_csv("data/processed_data.csv", index=False)
+    print(game_features + player_features)
+    return df, game_features + player_features
