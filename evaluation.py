@@ -24,4 +24,4 @@ def calculate_position_rmse(results: dict) -> pd.DataFrame:
     new_df = pd.DataFrame(new_data)
     new_df.set_index("Model", inplace=True)
 
-    return new_df
+    return new_df.T
