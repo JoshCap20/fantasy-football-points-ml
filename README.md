@@ -6,11 +6,7 @@ Future goals include integration with data scraping and frontend application.
 
 ## Perfomance
 
-### RMSE Comparison by Position
-
-![RMSE Comparison by Position](./results/fantasy_rmse_comparison_by_position.png)
-
-### RMSE for each Position by Model
+### RMSE by Position grouped by Model
 
 ![RMSE for each Position by Model](./results/position_rmse_comparison_by_model.png)
 

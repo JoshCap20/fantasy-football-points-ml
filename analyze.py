@@ -23,16 +23,16 @@ class FantasyFootballAnalysis:
                 va="bottom",
             )
 
-    def find_best_estimator(self):
-        min_rmse_by_position = {}
-        print("The best estimator for each position with the lowest RMSE is:\n")
-        for position in self.df.columns[1:]:
-            min_rmse = self.df[position].min()
-            min_rmse_index = self.df[position].idxmin()
-            min_rmse_algo = self.df.iloc[min_rmse_index, 0]
-            min_rmse_by_position[position] = min_rmse
-            print(f"{position}: {min_rmse_algo} with RMSE: {min_rmse:.3f}")
-        return min_rmse_by_position
+    # def find_best_estimator(self):
+    #     min_rmse_by_position = {}
+    #     print("The best estimator for each position with the lowest RMSE is:\n")
+    #     for position in self.df.columns[1:]:
+    #         min_rmse = self.df[position].min()
+    #         min_rmse_index = self.df[position].idxmin()
+    #         min_rmse_algo = self.df.iloc[min_rmse_index, 0]
+    #         min_rmse_by_position[position] = min_rmse
+    #         print(f"{position}: {min_rmse_algo} with RMSE: {min_rmse:.3f}")
+    #     return min_rmse_by_position
 
     def plot_rmse_by_model_and_position(self):
         num_positions = len(self.df.columns)
@@ -191,8 +191,8 @@ class FantasyFootballAnalysis:
 
 def main():
     analysis = FantasyFootballAnalysis()
-    analysis.find_best_estimator()
-    analysis.compare_rmse()
+    # analysis.find_best_estimator()
+    # analysis.compare_rmse()
     analysis.plot_rmse_by_model_and_position()
     analysis.plot_rmse_distribution()
     # Assume `train_df` is the DataFrame with your features for the heatmap#
