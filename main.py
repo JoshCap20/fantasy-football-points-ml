@@ -7,8 +7,8 @@ Assumes data aggregation already and files data/aggregated_2015.csv and data/agg
 from data_processing import load_and_process_data
 from feature_engineering import create_features
 from model_training import train_model
-from evaluation import calculate_fantasy_rmse, calculate_position_rmse, OutputManager
-from logger import get_logger
+from evaluation import calculate_fantasy_rmse, calculate_position_rmse
+from utils import get_logger, OutputManager
 
 logger = get_logger(__name__)
 
