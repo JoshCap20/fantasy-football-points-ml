@@ -2,6 +2,7 @@ from data_processing import load_and_process_data
 from feature_engineering import create_features
 from model_training import train_model
 from evaluation import save_results, calculate_fantasy_data_rmse
+import logging
 
 
 def main():
@@ -16,12 +17,13 @@ def main():
     results = {}
 
     for position in positions:
-        print(f"Learning for Position {position} ...")
+        logging.info(f"Learning for Position {position} ...")
         results[position] = train_model(train_df, test_df, features, position)
 
     save_results(results, "rmse.csv")
     calculate_fantasy_data_rmse(test_df)
-    print("Program finished normally")
+    logging.info("Results saved to rmse.csv and FantasyData_rmse.csv")
+    logging.info("Program finished normally")
 
 
 if __name__ == "__main__":
