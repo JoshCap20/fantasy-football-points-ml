@@ -4,21 +4,9 @@ from sklearn.linear_model import RidgeCV, ElasticNetCV, BayesianRidge
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.metrics import mean_squared_error
 from sklearn.pipeline import make_pipeline
-from sklearn.impute import SimpleImputer
-from sklearn.svm import SVC
+from data_processing import drop_missing_values
 import pandas as pd
 import numpy as np
-
-
-def drop_missing_values(df: pd.DataFrame, features: list[str]) -> pd.DataFrame:
-    df = df.dropna(subset=features)
-    return df
-
-
-def impute_missing_values(df: pd.DataFrame, features: list[str]) -> pd.DataFrame:
-    imputer = SimpleImputer(strategy="mean")
-    df[features] = imputer.fit_transform(df[features])
-    return df
 
 
 def train_model(
