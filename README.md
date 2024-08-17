@@ -10,6 +10,10 @@ Future goals include integration with data scraping and frontend application.
 
 ![RMSE for each Position by Model](./results/position_rmse_comparison_by_model.png)
 
+### RSME Distribution by Model
+
+![RMSE Distribution by Model](./results/rmse_distribution_by_model.png)
+
 ## Models
 
 1. **Ride Regression** - Ridge regression is similar to linear regression however it contains a penalty term which increases as the feature coefficients increase.
@@ -18,13 +22,14 @@ Future goals include integration with data scraping and frontend application.
 4. **Random Forest** - Random forest is a tree-based machine learning algorithm which splits on randomly generated selection features in an attempt to prevent over-fitting.
 5. **Gradient Boosting** - Gradient Boosting is also a tree-based method which learns from previous performance mistakes. A grid search was performed to optimize the parameters within the model.
 
+*For each algorithm, separate models were developed for each position.*
+
 ### Model Improvements
 
-1. The Ridge Regression and Elastic Net Regularization models have the data scaled using the StandardScaler method from the sklearn library first due to their sensitivity to the scale of the data.
-
-*For each algorithm, separate models were developed for each position.*
+1. The linear models (Ridge Regression, Elastic Net Regularization, and Bayesian Ridge Regression) have the data scaled using the StandardScaler method from the sklearn library first due to their sensitivity to the scale of the data.
+2. Use of KFold cross-validation to prevent overfitting.
+3. Hyperparameter tuning using GridSearchCV to optimize the model parameters.
 
 ## Data
 
-Data currently is sourced from the original project. It includes 2015 and 2016. 
-TODO: Add data from 2017-2020
+Data is dynamically scraped for input years from the nfl_data_py package. The data is then cleaned, aggregated, and transformed to be used in the models.
