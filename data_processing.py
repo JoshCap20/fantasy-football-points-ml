@@ -3,6 +3,8 @@ from utils import get_logger
 from sklearn.impute import SimpleImputer
 from data_scraper import get_weekly_data, get_season_schedule
 from config import POSITIONS
+import os
+
 logging = get_logger(__name__)
 
 
@@ -18,18 +20,50 @@ def load_and_process_data(file_name: str) -> pd.DataFrame:
     return df
 
 
+def load_weekly_data(year: int) -> pd.DataFrame:
+    file_path = f"data/weekly_{year}.csv"
+    if os.path.exists(file_path):
+        print(f"Loading weekly data for {year} from local cache.")
+        return pd.read_csv(file_path).copy()
+    else:
+        print(f"Downloading weekly data for {year}.")
+        weekly_df = get_weekly_data([year])
+        weekly_df.to_csv(file_path, index=False)
+        return weekly_df.copy()
+
+
+def load_schedule_data(year: int) -> pd.DataFrame:
+    file_path = f"data/schedule_{year}.csv"
+    if os.path.exists(file_path):
+        print(f"Loading schedule data for {year} from local cache.")
+        return pd.read_csv(file_path).copy()
+    else:
+        print(f"Downloading schedule data for {year}.")
+        schedule_df = get_season_schedule([year])
+        schedule_df.to_csv(file_path, index=False)
+        return schedule_df.copy()
+
+
 def load_data(years: list[int]) -> pd.DataFrame:
-    weekly_df = get_weekly_data(years)
-    schedule_df = get_season_schedule(years)
-    
-    weekly_df = weekly_df[weekly_df["position"].isin(POSITIONS)]
-    
-    return pd.merge(
-        weekly_df,
-        schedule_df,
-        left_on=["season", "week", "recent_team"],
-        right_on=["season", "week", "home_team"],
-    )
+    all_data = []
+
+    for year in years:
+        weekly_df = load_weekly_data(year)
+        schedule_df = load_schedule_data(year)
+
+        weekly_df = weekly_df[weekly_df["position"].isin(POSITIONS)]
+
+        merged_df = pd.merge(
+            weekly_df,
+            schedule_df,
+            left_on=["season", "week", "recent_team"],
+            right_on=["season", "week", "home_team"],
+        )
+        all_data.append(merged_df)
+
+    combined_df = pd.concat(all_data, ignore_index=True)
+
+    return combined_df.copy()
 
 
 def drop_missing_values(df: pd.DataFrame, features: list[str]) -> pd.DataFrame:
