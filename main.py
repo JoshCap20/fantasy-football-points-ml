@@ -7,7 +7,7 @@ Assumes data aggregation already and files data/aggregated_2015.csv and data/agg
 from data_processing import load_and_process_data
 from feature_engineering import create_features
 from model_training import train_model
-from evaluation import OutputManager, calculate_fantasy_data_rmse
+from evaluation import calculate_fantasy_rmse, calculate_position_rmse, OutputManager
 from logger import get_logger
 
 logger = get_logger(__name__)
@@ -30,12 +30,15 @@ def main():
         logger.info(f"Learning for Position {position} ...")
         results[position] = train_model(train_df, test_df, features, position)
 
-    OutputManager.save_results_from_dictionary(results, "rmse.csv")
-    OutputManager.save_results_from_dataframe(calculate_fantasy_data_rmse(test_df), "fantasy_data_rmse.csv")
+    OutputManager.save_results_from_dictionary(
+        calculate_position_rmse(results), "position_rmse.csv"
+    )
+    OutputManager.save_results_from_dataframe(
+        calculate_fantasy_rmse(test_df), "fantasy_rmse.csv"
+    )
     logger.info("Results saved successfully")
-    
-    logger.info("Program finished normally")
 
+    logger.info("Program finished normally")
 
 if __name__ == "__main__":
     main()
