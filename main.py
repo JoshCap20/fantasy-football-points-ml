@@ -4,7 +4,7 @@ Entry point.
 Assumes data aggregation already and files data/aggregated_2015.csv and data/aggregated_2016.csv exist.
 """
 
-from data_processing import load_and_process_data, load_data
+from data_processing import load_data
 from feature_engineering import create_features
 from model_training import train_model
 from evaluation import calculate_position_rmse
