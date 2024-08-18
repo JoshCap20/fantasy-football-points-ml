@@ -1,3 +1,6 @@
+"""
+Data is scraped and saved to a file which acts as a sort of cache for perfomance speedup.
+"""
 import pandas as pd
 from utils import get_logger
 from sklearn.impute import SimpleImputer

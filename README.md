@@ -2,8 +2,6 @@
 
 Fantasy is right around the corner so I'll go ahead and open source this for others to use and contribute to. You can change what years are used for training and testing data by changing the `TRAIN_YEARS` and `TEST_YEARS` variables in the `config.py` file. It will automatically scrape the data for the years you specify and train the models.
 
-Revival of this project: https://github.com/zzhangusf/Predicting-Fantasy-Football-Points-Using-Machine-Learning/tree/master
-
 ## Perfomance
 
 ### RMSE by Position grouped by Model
@@ -14,16 +12,6 @@ Revival of this project: https://github.com/zzhangusf/Predicting-Fantasy-Footbal
 
 ![RMSE Distribution by Model](./results/rmse_distribution_by_model.png)
 
-## Perfomance
-
-### RMSE Comparison by Position
-
-![RMSE Comparison by Position](./results/fantasy_rmse_comparison_by_position.png)
-
-### RMSE for each Position by Model
-
-![RMSE for each Position by Model](./results/position_rmse_comparison_by_model.png)
-
 ## Models
 
 1. **Ride Regression** - Ridge regression is similar to linear regression however it contains a penalty term which increases as the feature coefficients increase.
@@ -32,13 +20,35 @@ Revival of this project: https://github.com/zzhangusf/Predicting-Fantasy-Footbal
 4. **Random Forest** - Random forest is a tree-based machine learning algorithm which splits on randomly generated selection features in an attempt to prevent over-fitting.
 5. **Gradient Boosting** - Gradient Boosting is also a tree-based method which learns from previous performance mistakes. A grid search was performed to optimize the parameters within the model.
 
-*For each algorithm, separate models were developed for each position.*
+*Each position has separate groups of models.*
 
-### Model Improvements
+New models can easily be added and compared by adding them to the models dictionary in `model_training.py/train_model()`. The perfomance will also be outputted in the results csv. New features in the data can be added by adding them in `feature_engineering.py/add_features().`
 
-1. The linear models (Ridge Regression, Elastic Net Regularization, and Bayesian Ridge Regression) have the data scaled using the StandardScaler method from the sklearn library first due to their sensitivity to the scale of the data.
-2. Use of KFold cross-validation to prevent overfitting.
-3. Hyperparameter tuning using GridSearchCV to optimize the model parameters.
+## Running the Model
+
+To run the model, first install the required packages:
+
+```bash
+pip install -r requirements.txt
+```
+
+Then run the following command:
+
+```bash
+python main.py
+```
+
+The model will train and test on the years specified in the `config.py` file. The results will be outputed to the `results` folder.
+
+## Validation
+
+After running the main file, the model's accuracy is outputed by position and model in results/position_rmse.csv. The RMSE is calculated by taking the square root of the mean of the squared differences between the predicted and actual values. The RMSE is used to determine the accuracy of the models.
+
+To visualize the results of the models like the above, run the following command:
+
+```bash
+python analyze.py
+```
 
 ## Data
 
