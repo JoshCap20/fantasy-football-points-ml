@@ -14,6 +14,16 @@ Revival of this project: https://github.com/zzhangusf/Predicting-Fantasy-Footbal
 
 ![RMSE Distribution by Model](./results/rmse_distribution_by_model.png)
 
+## Perfomance
+
+### RMSE Comparison by Position
+
+![RMSE Comparison by Position](./results/fantasy_rmse_comparison_by_position.png)
+
+### RMSE for each Position by Model
+
+![RMSE for each Position by Model](./results/position_rmse_comparison_by_model.png)
+
 ## Models
 
 1. **Ride Regression** - Ridge regression is similar to linear regression however it contains a penalty term which increases as the feature coefficients increase.
