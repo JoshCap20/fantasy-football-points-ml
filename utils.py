@@ -22,6 +22,7 @@ def get_logger(name: str) -> logging.Logger:
 
     return logger
 
+
 class OutputManager:
     OUTPUT_DIRECTORY = "results/"
 
