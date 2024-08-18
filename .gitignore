@@ -1,8 +1,9 @@
 .venv
 .testing
+catboost_info
 
 *.pyc
 
-data/unused/*
-
 .DS_Store
+
+output/models/*

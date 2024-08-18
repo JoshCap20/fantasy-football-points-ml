@@ -1,6 +1,7 @@
 import pandas as pd
 from config import POSITIONS
 
+
 def calculate_position_rmse(results: dict) -> pd.DataFrame:
     new_data = {key: [] for key in ["Model"] + POSITIONS}
 

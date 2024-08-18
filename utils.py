@@ -8,10 +8,10 @@ import logging
 
 def get_logger(name: str) -> logging.Logger:
     logger = logging.getLogger(name)
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG)
 
     console_handler = logging.StreamHandler()
-    console_handler.setLevel(logging.INFO)
+    console_handler.setLevel(logging.DEBUG)
 
     formatter = logging.Formatter(
         "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -24,7 +24,7 @@ def get_logger(name: str) -> logging.Logger:
 
 
 class OutputManager:
-    OUTPUT_DIRECTORY = "results/"
+    OUTPUT_DIRECTORY = "output/"
 
     @classmethod
     def save_results_from_dictionary(

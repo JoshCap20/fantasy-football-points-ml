@@ -6,7 +6,7 @@ from sklearn.model_selection import learning_curve
 
 
 class FantasyFootballAnalysis:
-    def __init__(self, path="results/"):
+    def __init__(self, path="output/"):
         self.path = path
         self.df = pd.read_csv(self.path + "position_rmse.csv")
         self.df.set_index("Model", inplace=True)

@@ -6,11 +6,11 @@ Fantasy is right around the corner so I'll go ahead and open source this for oth
 
 ### RMSE by Position grouped by Model
 
-![RMSE for each Position by Model](./results/position_rmse_comparison_by_model.png)
+![RMSE for each Position by Model](./output/position_rmse_comparison_by_model.png)
 
 ### RSME Distribution by Model
 
-![RMSE Distribution by Model](./results/rmse_distribution_by_model.png)
+![RMSE Distribution by Model](./output/rmse_distribution_by_model.png)
 
 ## Models
 

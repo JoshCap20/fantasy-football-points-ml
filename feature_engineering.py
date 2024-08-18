@@ -3,6 +3,7 @@ from utils import get_logger
 
 logger = get_logger(__name__)
 
+
 def get_game_char_indicators(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
     df["home"] = (df["recent_team"] == df["home_team"]).astype(int)
 
@@ -56,41 +57,42 @@ def get_player_averages(
 
     return df, feature_names
 
+
 def add_features(df: pd.DataFrame) -> pd.DataFrame:
     """
     Engineer features here as needed, big model perfomance boost from these so far.
     """
     # Interaction Features
-    df['passing_yards_per_attempt'] = df['passing_yards'] / df['attempts']
-    df['rushing_yards_per_carry'] = df['rushing_yards'] / df['carries']
-    df['receiving_yards_per_target'] = df['receiving_yards'] / df['targets']
-    df['receiving_yards_per_reception'] = df['receiving_yards'] / df['receptions']
+    df["passing_yards_per_attempt"] = df["passing_yards"] / df["attempts"]
+    df["rushing_yards_per_carry"] = df["rushing_yards"] / df["carries"]
+    df["receiving_yards_per_target"] = df["receiving_yards"] / df["targets"]
+    df["receiving_yards_per_reception"] = df["receiving_yards"] / df["receptions"]
 
     # Polynomial Features
-    df['passing_yards_squared'] = df['passing_yards'] ** 2
-    df['rushing_yards_squared'] = df['rushing_yards'] ** 2
-    
+    df["passing_yards_squared"] = df["passing_yards"] ** 2
+    df["rushing_yards_squared"] = df["rushing_yards"] ** 2
+
     # Lag Features
-    df['fantasy_points_lag1'] = df.groupby('player_id')['fantasy_points'].shift(1)
-    df['fantasy_points_lag2'] = df.groupby('player_id')['fantasy_points'].shift(2)
-    
+    df["fantasy_points_lag1"] = df.groupby("player_id")["fantasy_points"].shift(1)
+    df["fantasy_points_lag2"] = df.groupby("player_id")["fantasy_points"].shift(2)
+
     feature_names = [
-        'passing_yards_per_attempt',
-        'rushing_yards_per_carry',
-        'receiving_yards_per_target',
-        'receiving_yards_per_reception',
-        'passing_yards_squared',
-        'rushing_yards_squared',
-        'fantasy_points_lag1',
-        'fantasy_points_lag2'
+        "passing_yards_per_attempt",
+        "rushing_yards_per_carry",
+        "receiving_yards_per_target",
+        "receiving_yards_per_reception",
+        "passing_yards_squared",
+        "rushing_yards_squared",
+        "fantasy_points_lag1",
+        "fantasy_points_lag2",
     ]
-    
+
     return df, feature_names
 
 
 def create_features(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
     df, new_features = add_features(df)
-    
+
     # These stats are averaged over the season, last 4 weeks, and previous week
     stats_to_average = [
         "attempts",
@@ -116,11 +118,11 @@ def create_features(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
         "receiving_yards_per_target",
         "receiving_yards_per_reception",
     ]
-    
+
     df, game_features = get_game_char_indicators(df)
     df, player_features = get_player_averages(df, stats_to_average)
-    
-    df.to_csv("data/processed_data.csv", index=False) # for debugging
+
+    # df.to_csv("data/processed_data.csv", index=False)  # for debugging
     logger.debug(game_features + player_features + new_features)
-    
+
     return df, game_features + player_features + new_features
