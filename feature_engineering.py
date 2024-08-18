@@ -1,5 +1,7 @@
 import pandas as pd
+from utils import get_logger
 
+logger = get_logger(__name__)
 
 def get_game_char_indicators(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
     df["home"] = (df["recent_team"] == df["home_team"]).astype(int)
@@ -111,5 +113,6 @@ def create_features(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
     df, player_features = get_player_averages(df, stats)
     
     df.to_csv("data/processed_data.csv", index=False)
-    print(game_features + player_features + new_features)
+    logger.debug(game_features + player_features + new_features)
+    
     return df, game_features + player_features + new_features
