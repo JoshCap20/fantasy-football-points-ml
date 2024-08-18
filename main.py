@@ -9,13 +9,13 @@ from feature_engineering import create_features
 from model_training import train_model
 from evaluation import calculate_position_rmse
 from utils import get_logger, OutputManager
-from config import POSITIONS
+from config import POSITIONS, TRAIN_YEARS, TEST_YEARS
 
 logger = get_logger(__name__)
 
 def main():
-    train_df = load_data([2015])
-    test_df = load_data([2016])
+    train_df = load_data(TRAIN_YEARS)
+    test_df = load_data(TEST_YEARS)
     logger.info("Data loaded and processed successfully")
 
     train_df, features = create_features(train_df)

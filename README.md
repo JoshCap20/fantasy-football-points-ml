@@ -1,8 +1,8 @@
 # Fantasy Football Points Prediction ML Model
 
-Revival of this project: https://github.com/zzhangusf/Predicting-Fantasy-Football-Points-Using-Machine-Learning/tree/master
+Fantasy is right around the corner so I'll go ahead and open source this for others to use and contribute to. You can change what years are used for training and testing data by changing the `TRAIN_YEARS` and `TEST_YEARS` variables in the `config.py` file. It will automatically scrape the data for the years you specify and train the models.
 
-Future goals include integration with data scraping and frontend application.
+Revival of this project: https://github.com/zzhangusf/Predicting-Fantasy-Football-Points-Using-Machine-Learning/tree/master
 
 ## Perfomance
 
