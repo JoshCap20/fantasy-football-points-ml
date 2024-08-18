@@ -6,12 +6,13 @@ Assumes data aggregation already and files data/aggregated_2015.csv and data/agg
 
 from data_processing import load_data
 from feature_engineering import create_features
-from model_training import train_model
+from model_training import train_models
 from evaluation import calculate_position_rmse
 from utils import get_logger, OutputManager
 from config import POSITIONS, TRAIN_YEARS, TEST_YEARS
 
 logger = get_logger(__name__)
+
 
 def main():
     train_df = load_data(TRAIN_YEARS)
@@ -26,7 +27,7 @@ def main():
 
     for position in POSITIONS:
         logger.info(f"Learning for Position {position} ...")
-        all_results[position] = train_model(train_df, test_df, features, position)
+        all_results[position] = train_models(train_df, test_df, features, position)
 
     OutputManager.save_results_from_dictionary(
         calculate_position_rmse(all_results), "position_rmse.csv"
