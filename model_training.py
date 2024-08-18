@@ -17,8 +17,8 @@ def train_model(
     df_train: pd.DataFrame, df_test: pd.DataFrame, features: list[str], position: str
 ):
     logger.debug(f"Training with features: {features}")
-    df_train = drop_missing_values(df_train.copy(), features)
-    df_test = drop_missing_values(df_test.copy(), features)
+    df_train = impute_missing_values_with_zero(df_train.copy(), features)
+    df_test = impute_missing_values_with_zero(df_test.copy(), features)
 
     models = {
         # Linear models
@@ -29,7 +29,7 @@ def train_model(
             StandardScaler(), ElasticNetCV(cv=5, max_iter=10000)
         ),
         "BayesianRidge": make_pipeline(StandardScaler(), BayesianRidge()),
-        # Ensemble models
+        # Tree-based models
         "RandomForestRegressor": GridSearchCV(
             RandomForestRegressor(),
             param_grid={"max_depth": [3, 5, 10], "n_estimators": [50, 100]},
