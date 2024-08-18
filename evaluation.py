@@ -1,36 +1,21 @@
 import pandas as pd
-import ast
-
-def calculate_fantasy_rmse(df: pd.DataFrame) -> pd.Series:
-    df["diff"] = (df["proj"] - df["FD points"]) ** 2.0
-    FantasyData_rmse = df.groupby(["Pos"])["diff"].mean() ** 0.5
-    return FantasyData_rmse
+from config import POSITIONS
 
 def calculate_position_rmse(results: dict) -> pd.DataFrame:
-    df = pd.DataFrame(results).T
-    
-    new_data = {
-        "Model": [],
-        "PK": [],
-        "QB": [],
-        "WR": [],
-        "TE": [],
-        "RB": []
-    }
-    
-    for position in df.index:
-        for model in df.columns:
-            rmse_dict = ast.literal_eval(df.at[position, model])
+    new_data = {key: [] for key in ["Model"] + POSITIONS}
 
-            for key, rmse_type in rmse_dict.items():
-                row_name = f"{model}_{key}"
+    for position in results.keys():
+        for model in results[position].keys():
+            for metric, value in results[position][model].items():
+                row_name = f"{model}_{metric}"
                 if row_name not in new_data["Model"]:
                     new_data["Model"].append(row_name)
+                    for pos in POSITIONS:
+                        new_data[pos].append(float("nan"))
+                idx = new_data["Model"].index(row_name)
+                new_data[position][idx] = value
 
-                new_data[position].append(rmse_type)
-                
     new_df = pd.DataFrame(new_data)
     new_df.set_index("Model", inplace=True)
 
-    return new_df
-
+    return new_df.T
