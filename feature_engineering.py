@@ -54,8 +54,34 @@ def get_player_averages(
 
     return df, feature_names
 
+def add_features(df: pd.DataFrame) -> pd.DataFrame:
+    # Interaction Features
+    df['passing_yards_per_attempt'] = df['passing_yards'] / df['attempts']
+    df['rushing_yards_per_carry'] = df['rushing_yards'] / df['carries']
+    df['receiving_yards_per_target'] = df['receiving_yards'] / df['targets']
+    df['receiving_yards_per_reception'] = df['receiving_yards'] / df['receptions']
+
+    # Polynomial Features
+    df['passing_yards_squared'] = df['passing_yards'] ** 2
+    df['rushing_yards_squared'] = df['rushing_yards'] ** 2# Lag Features
+    df['fantasy_points_lag1'] = df.groupby('player_id')['fantasy_points'].shift(1)
+    df['fantasy_points_lag2'] = df.groupby('player_id')['fantasy_points'].shift(2)
+    
+    feature_names = [
+        'passing_yards_per_attempt',
+        'rushing_yards_per_carry',
+        'passing_yards_squared',
+        'rushing_yards_squared',
+        'fantasy_points_lag1',
+        'fantasy_points_lag2'
+    ]
+    
+    return df, feature_names
+
 
 def create_features(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
+    df, new_features = add_features(df)
+    
     stats = [
         "attempts",
         "completions",
@@ -73,11 +99,17 @@ def create_features(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
         "rushing_fumbles",
         "receiving_fumbles",
         "sack_fumbles",
+        "passing_yards_per_attempt",
+        "rushing_yards_per_carry",
+        "passing_yards_squared",
+        "rushing_yards_squared",
+        "receiving_yards_per_target",
+        "receiving_yards_per_reception",
     ]
     
     df, game_features = get_game_char_indicators(df)
     df, player_features = get_player_averages(df, stats)
     
     df.to_csv("data/processed_data.csv", index=False)
-    print(game_features + player_features)
-    return df, game_features + player_features
+    print(game_features + player_features + new_features)
+    return df, game_features + player_features + new_features
