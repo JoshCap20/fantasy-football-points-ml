@@ -122,7 +122,7 @@ def create_features(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
     df, game_features = get_game_char_indicators(df)
     df, player_features = get_player_averages(df, stats_to_average)
 
-    df.to_csv("data/processed_data.csv", index=False)  # for debugging
+    # df.to_csv("data/processed_data.csv", index=False)  # for debugging
     logger.debug(game_features + player_features + new_features)
 
     return df, game_features + player_features + new_features

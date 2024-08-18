@@ -24,8 +24,8 @@ def load_and_process_data(file_name: str) -> pd.DataFrame:
     return df
 
 
-def load_weekly_data(year: int) -> pd.DataFrame:
-    file_path = f"data/weekly_{year}.csv"
+def load_weekly_data(year: int, filepath: str) -> pd.DataFrame:
+    file_path = f"{filepath}/weekly_{year}.csv"
     if os.path.exists(file_path):
         logger.debug(f"Loading weekly data for {year} from local cache.")
         return pd.read_csv(file_path).copy()
@@ -36,8 +36,8 @@ def load_weekly_data(year: int) -> pd.DataFrame:
         return weekly_df.copy()
 
 
-def load_schedule_data(year: int) -> pd.DataFrame:
-    file_path = f"data/schedule_{year}.csv"
+def load_schedule_data(year: int, filepath: str) -> pd.DataFrame:
+    file_path = f"{filepath}/schedule_{year}.csv"
     if os.path.exists(file_path):
         logger.debug(f"Loading schedule data for {year} from local cache.")
         return pd.read_csv(file_path).copy()
@@ -48,12 +48,12 @@ def load_schedule_data(year: int) -> pd.DataFrame:
         return schedule_df.copy()
 
 
-def load_data(years: list[int]) -> pd.DataFrame:
+def load_data(years: list[int], filepath: str = "data") -> pd.DataFrame:
     all_data = []
 
     for year in years:
-        weekly_df = load_weekly_data(year)
-        schedule_df = load_schedule_data(year)
+        weekly_df = load_weekly_data(year, filepath)
+        schedule_df = load_schedule_data(year, filepath)
 
         weekly_df = weekly_df[weekly_df["position"].isin(POSITIONS)]
 
