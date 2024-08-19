@@ -87,7 +87,7 @@ class FantasyFootballAnalysis:
             ax.set_ylabel("RMSE")
             ax.set_title(f"RMSE by Model for Position: {position}", fontsize=14, pad=20)
             ax.set_xticks(ind)
-            ax.set_xticklabels(self.base_models, rotation=0, ha="right", fontsize=10)
+            ax.set_xticklabels(self.base_models, rotation=20, ha="right", fontsize=10)
 
         handles, labels = axes[0].get_legend_handles_labels()
         fig.legend(handles, labels, loc="upper center", ncol=3, fontsize=12)
