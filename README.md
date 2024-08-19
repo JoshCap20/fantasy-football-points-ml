@@ -16,9 +16,12 @@ Fantasy is right around the corner so I'll go ahead and open source this for oth
 
 1. **Ride Regression** - Ridge regression is similar to linear regression however it contains a penalty term which increases as the feature coefficients increase.
 2. **Bayesian Ridge Regression** - Bayesian ridge regression is similar to ridge regression however it includes information about the features to determine the penalty weight.
-3. **Elastic Net Regularization** - Elastic net regularization applies a weighted average of the ridge regression and lasso regression penalties. 
-4. **Random Forest** - Random forest is a tree-based machine learning algorithm which splits on randomly generated selection features in an attempt to prevent over-fitting.
-5. **Gradient Boosting** - Gradient Boosting is also a tree-based method which learns from previous performance mistakes. A grid search was performed to optimize the parameters within the model.
+3. **Elastic Net Regularization** - Elastic net regularization applies a weighted average of the ridge regression and lasso regression penalties.
+4. **Random Forest Regressor** - Random forest is a tree-based machine learning algorithm which splits on randomly generated selection features in an attempt to prevent over-fitting.
+5. **Gradient Boosting Regressorr** - Gradient Boosting is also a tree-based method which learns from previous performance mistakes.
+6. **CatBoost Regressor** - CatBoost is a tree-based method which is optimized for performance and efficiency.
+7. **Multi-Layer Perceptron** - A neural network model which contains multiple layers of neurons.
+
 
 *Each position has separate groups of models.*
 
