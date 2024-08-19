@@ -76,13 +76,8 @@ def add_features(df: pd.DataFrame) -> pd.DataFrame:
     df["fantasy_points_lag1"] = df.groupby("player_id")["fantasy_points"].shift(1)
     df["fantasy_points_lag2"] = df.groupby("player_id")["fantasy_points"].shift(2)
 
+    # Since these are kept in the model, only add non-target features to feature_names
     feature_names = [
-        "passing_yards_per_attempt",
-        "rushing_yards_per_carry",
-        "receiving_yards_per_target",
-        "receiving_yards_per_reception",
-        "passing_yards_squared",
-        "rushing_yards_squared",
         "fantasy_points_lag1",
         "fantasy_points_lag2",
     ]
@@ -91,7 +86,7 @@ def add_features(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def create_features(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
-    df, new_features = add_features(df)
+    df, feature_names = add_features(df)
 
     # These stats are averaged over the season, last 4 weeks, and previous week
     stats_to_average = [
@@ -123,6 +118,6 @@ def create_features(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
     df, player_features = get_player_averages(df, stats_to_average)
 
     # df.to_csv("data/processed_data.csv", index=False)  # for debugging
-    logger.debug(game_features + player_features + new_features)
+    logger.debug(game_features + player_features + feature_names)
 
-    return df, game_features + player_features + new_features
+    return df, game_features + player_features + feature_names
