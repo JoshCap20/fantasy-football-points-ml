@@ -9,7 +9,7 @@ from feature_engineering import create_features
 from model_training import train_models
 from utils import get_logger
 from config import TRAIN_YEARS, TEST_YEARS
-from analysis import run_analysis
+from analyze import run_analysis
 
 logger = get_logger(__name__)
 

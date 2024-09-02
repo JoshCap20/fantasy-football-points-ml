@@ -63,7 +63,9 @@ def train_models_by_position(
     df_train = impute_missing_values_with_median(df_train.copy(), feature_columns)
     df_test = impute_missing_values_with_median(df_test.copy(), feature_columns)
         
+
     models = {
+        # Remove these three prob
         "Ridge": make_pipeline(
             StandardScaler(), RidgeCV(alphas=np.logspace(-6, 6, 13))
         ),
@@ -92,7 +94,7 @@ def train_models_by_position(
             param_grid={"max_depth": [3, 5, 10], "n_estimators": [50, 100]},
             cv=5,
         ),
-                "RandomForest": GridSearchCV(
+        "RandomForest": GridSearchCV(
             RandomForestRegressor(),
             param_grid={"max_depth": [3, 5, 10], "n_estimators": [50, 100]},
             cv=5,
