@@ -13,7 +13,11 @@ from sklearn.metrics import mean_squared_error
 from sklearn.pipeline import make_pipeline
 from sklearn.neighbors import KNeighborsRegressor
 import catboost as cb
-from data_processing import drop_missing_values, impute_missing_values_with_zero, impute_missing_values_with_median
+from data_processing import (
+    drop_missing_values,
+    impute_missing_values_with_zero,
+    impute_missing_values_with_median,
+)
 from utils import get_logger
 import pandas as pd
 import numpy as np
@@ -22,7 +26,6 @@ import os
 
 from config import POSITIONS
 from evaluation import calculate_position_rmse
-
 
 
 logger = get_logger(__name__)
@@ -45,7 +48,9 @@ def train_models(
         )
 
     model_performance_results = calculate_position_rmse(model_performance_results)
-    model_performance_results.to_csv(f"output/rmse_{timestamp}.csv", header=True, index=True)
+    model_performance_results.to_csv(
+        f"output/rmse_{timestamp}.csv", header=True, index=True
+    )
     return model_performance_results
 
 
@@ -58,11 +63,10 @@ def train_models_by_position(
     suffix: str = "",
 ):
     logger.debug(f"Selected features: {feature_columns}")
-    
+
     # Defaults to filling with median. Other options for missing values are zero and mean.
     df_train = drop_missing_values(df_train.copy(), feature_columns)
     df_test = drop_missing_values(df_test.copy(), feature_columns)
-        
 
     models = {
         # Remove these three prob
@@ -73,10 +77,8 @@ def train_models_by_position(
         #     StandardScaler(),
         #     LassoCV(cv=5, max_iter=20000, alphas=np.logspace(-6, 6, 50)),
         # ),
-       
         # "BayesianRidge": make_pipeline(StandardScaler(), BayesianRidge()),
-
-        # ** 
+        # **
         "ElasticNet": make_pipeline(
             StandardScaler(), ElasticNetCV(cv=5, max_iter=10000)
         ),
@@ -100,12 +102,11 @@ def train_models_by_position(
             cv=5,
         ),
         # **
-        
         "KNN": GridSearchCV(
             KNeighborsRegressor(),
             param_grid={"n_neighbors": [3, 5, 10]},
             cv=5,
-        )
+        ),
     }
 
     logger.debug(f"Training with models: {models.keys()}")
@@ -127,7 +128,10 @@ def train_models_by_position(
             scoring="neg_mean_squared_error",
         )
 
-        model.fit(train_data_by_position[feature_columns], train_data_by_position["fantasy_points_ppr"])
+        model.fit(
+            train_data_by_position[feature_columns],
+            train_data_by_position["fantasy_points_ppr"],
+        )
 
         train_rmse = np.sqrt(
             mean_squared_error(
@@ -137,7 +141,8 @@ def train_models_by_position(
         )
         test_rmse = np.sqrt(
             mean_squared_error(
-                test_data_by_position["fantasy_points_ppr"], model.predict(test_data_by_position[feature_columns])
+                test_data_by_position["fantasy_points_ppr"],
+                model.predict(test_data_by_position[feature_columns]),
             )
         )
         cross_val_rmse = np.sqrt(-cv_scores.mean())
@@ -158,6 +163,8 @@ def train_models_by_position(
                 model_dir, f"{position}/{model_name}_{suffix}.joblib"
             )
             joblib.dump(model, model_path)
-            logger.info(f"Model {model_name} for position {position} saved to {model_path}")
+            logger.info(
+                f"Model {model_name} for position {position} saved to {model_path}"
+            )
 
     return performance_results

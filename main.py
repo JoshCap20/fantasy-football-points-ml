@@ -25,7 +25,7 @@ def main():
 
     train_models(train_df, test_df, features)
     logger.info("Program finished normally")
-    
+
     run_analysis()
     logger.info("Analysis completed")
 

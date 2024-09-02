@@ -42,7 +42,7 @@ Then run the following command:
 python main.py
 ```
 
-The model will train and test on the years specified in the `config.py` file. The results will be outputed to the `output` folder.
+The model will train and test on the years specified in the `config.py` file. The results will be outputed to the `output` folder. The results include graphs and information about each models perfomance on the data. In `output/models/`, each model is saved by position and model name as a pickle file for future use.
 
 ## Validation - DEPRECATED
 
@@ -62,8 +62,8 @@ python analyze.py
 
 ## Data
 
-Data is dynamically scraped for input years from the nfl_data_py package. The data is then cleaned, aggregated, and transformed to be used in the models.
+Data is dynamically scraped for input years from the nfl_data_py package. The data is then cleaned, aggregated, and transformed to be used in the models. Some of the data used is saved to file to act as a local cache in `data/`. This is also for others to use since the data is not easily accessible like college basketball data.
 
-Feature engineer includes creating rolling averages for each stats for each player over differing timeframes (last game, 4 games, season). 
+Feature engineer includes creating rolling averages for each stats for each player over differing timeframes (last game, 4 games, season).
 
 Null data can be dropped, filled with mean or median easily in model_training. Default is to drop it.
