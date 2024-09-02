@@ -7,3 +7,5 @@ catboost_info
 .DS_Store
 
 output/models/*
+DS_Store
+# data/

@@ -63,3 +63,7 @@ python analyze.py
 ## Data
 
 Data is dynamically scraped for input years from the nfl_data_py package. The data is then cleaned, aggregated, and transformed to be used in the models.
+
+Feature engineer includes creating rolling averages for each stats for each player over differing timeframes (last game, 4 games, season). 
+
+Null data can be dropped, filled with mean or median easily in model_training. Default is to drop it.

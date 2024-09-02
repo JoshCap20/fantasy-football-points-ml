@@ -60,21 +60,21 @@ def train_models_by_position(
     logger.debug(f"Selected features: {feature_columns}")
     
     # Defaults to filling with median. Other options for missing values are zero and mean.
-    df_train = impute_missing_values_with_median(df_train.copy(), feature_columns)
-    df_test = impute_missing_values_with_median(df_test.copy(), feature_columns)
+    df_train = drop_missing_values(df_train.copy(), feature_columns)
+    df_test = drop_missing_values(df_test.copy(), feature_columns)
         
 
     models = {
         # Remove these three prob
-        "Ridge": make_pipeline(
-            StandardScaler(), RidgeCV(alphas=np.logspace(-6, 6, 13))
-        ),
-        "Lasso": make_pipeline(
-            StandardScaler(),
-            LassoCV(cv=5, max_iter=20000, alphas=np.logspace(-6, 6, 50)),
-        ),
+        # "Ridge": make_pipeline(
+        #     StandardScaler(), RidgeCV(alphas=np.logspace(-6, 6, 13))
+        # ),
+        # "Lasso": make_pipeline(
+        #     StandardScaler(),
+        #     LassoCV(cv=5, max_iter=20000, alphas=np.logspace(-6, 6, 50)),
+        # ),
        
-        "BayesianRidge": make_pipeline(StandardScaler(), BayesianRidge()),
+        # "BayesianRidge": make_pipeline(StandardScaler(), BayesianRidge()),
 
         # ** 
         "ElasticNet": make_pipeline(
