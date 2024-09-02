@@ -14,11 +14,15 @@ Fantasy is right around the corner so I'll go ahead and open source this for oth
 
 ## Models
 
-1. **Ride Regression** - Ridge regression is similar to linear regression however it contains a penalty term which increases as the feature coefficients increase.
-2. **Bayesian Ridge Regression** - Bayesian ridge regression is similar to ridge regression however it includes information about the features to determine the penalty weight.
-3. **Elastic Net Regularization** - Elastic net regularization applies a weighted average of the ridge regression and lasso regression penalties. 
-4. **Random Forest** - Random forest is a tree-based machine learning algorithm which splits on randomly generated selection features in an attempt to prevent over-fitting.
-5. **Gradient Boosting** - Gradient Boosting is also a tree-based method which learns from previous performance mistakes. A grid search was performed to optimize the parameters within the model.
+1. **Elastic Net Regularization** - Elastic Net combines both L1 and L2 penalties of Lasso and Ridge, respectively, making it effective for handling datasets with multicollinearity and for selecting correlated features. This hybrid approach balances feature selection and regularization, reducing overfitting while retaining important predictors.
+
+2. **Random Forest Regressor** - An ensemble learning method that constructs multiple decision trees during training and outputs the average prediction of the individual trees. Its ensemble approach enhances robustness and reduces the likelihood of overfitting, making it reliable for datasets with high variance or noise.
+
+3. **Gradient Boosting Regressor** - This model builds an ensemble of weak learners, typically decision trees, sequentially, where each tree corrects the errors of the previous one. It is highly effective for capturing complex, non-linear relationships, often resulting in superior predictive performance on structured data.
+
+4. **CatBoost Regressor** - A gradient boosting algorithm specifically optimized for categorical features, offering excellent performance with minimal hyperparameter tuning. Its ability to handle categorical data natively and its automatic feature combination make it particularly strong in real-world datasets with mixed data types.
+
+5. **K-Nearest Neighbors Regressor** - A non-parametric model that predicts the target value based on the average of the nearest k neighbors in the feature space. It is intuitive and effective for capturing local patterns in the data, though its performance can degrade with high-dimensional data or noisy features.
 
 *Each position has separate groups of models.*
 
@@ -38,17 +42,23 @@ Then run the following command:
 python main.py
 ```
 
-The model will train and test on the years specified in the `config.py` file. The results will be outputed to the `results` folder.
+The model will train and test on the years specified in the `config.py` file. The results will be outputed to the `output` folder.
 
-## Validation
+## Validation - DEPRECATED
 
-After running the main file, the model's accuracy is outputed by position and model in results/position_rmse.csv. The RMSE is calculated by taking the square root of the mean of the squared differences between the predicted and actual values. The RMSE is used to determine the accuracy of the models.
+*While this still works, it is automatically ran after the main file is ran now.*  
+
+After running the main file, the model's accuracy is outputed by position and model in results/rmse.csv. The RMSE is calculated by taking the square root of the mean of the squared differences between the predicted and actual values. The RMSE is used to determine the accuracy of the models.
 
 To visualize the results of the models like the above, run the following command:
 
 ```bash
 python analyze.py
 ```
+
+## TODO
+
+- Combine models for each position into one model for each position.
 
 ## Data
 
