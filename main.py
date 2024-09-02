@@ -1,15 +1,15 @@
 """
 Entry point.
 
-Assumes data aggregation already and files data/aggregated_2015.csv and data/aggregated_2016.csv exist.
+Abstracts data cleaning, data processing, feature engineering, model training, and model evaluation.
 """
 
 from data_processing import load_data
 from feature_engineering import create_features
 from model_training import train_models
-from evaluation import calculate_position_rmse
-from utils import get_logger, OutputManager
-from config import POSITIONS, TRAIN_YEARS, TEST_YEARS
+from utils import get_logger
+from config import TRAIN_YEARS, TEST_YEARS
+from analysis import run_analysis
 
 logger = get_logger(__name__)
 
@@ -23,18 +23,11 @@ def main():
     test_df, _ = create_features(test_df)
     logger.info("Features created successfully")
 
-    all_results = {}
-
-    for position in POSITIONS:
-        logger.info(f"Learning for Position {position} ...")
-        all_results[position] = train_models(train_df, test_df, features, position)
-
-    OutputManager.save_results_from_dictionary(
-        calculate_position_rmse(all_results), "position_rmse.csv"
-    )
-    logger.info("Results saved successfully")
-
+    train_models(train_df, test_df, features)
     logger.info("Program finished normally")
+    
+    run_analysis()
+    logger.info("Analysis completed")
 
 
 if __name__ == "__main__":

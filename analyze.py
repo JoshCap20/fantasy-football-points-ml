@@ -189,7 +189,7 @@ class FantasyFootballAnalysis:
         plt.show()
 
 
-def main():
+def run_analysis():
     analysis = FantasyFootballAnalysis()
     # analysis.find_best_estimator()
     # analysis.compare_rmse()
@@ -202,4 +202,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    run_analysis()
