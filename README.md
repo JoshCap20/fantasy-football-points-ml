@@ -58,4 +58,4 @@ Data is dynamically scraped for input years from the nfl_data_py package. The da
 
 Feature engineer includes creating rolling averages for each stats for each player over differing timeframes (last game, 4 games, season).
 
-Null data can be dropped, filled with mean or median easily in model_training. Default is to drop it.
+Null data is imputed with zeros by default, but this can be tweaked in `model_training.py`.
