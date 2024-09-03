@@ -4,14 +4,17 @@ Utils
 
 from config import DEBUG
 import logging
+import signal
+import sys
 
 
-def get_logger(name: str) -> logging.Logger:
+def get_logger(name: str, log_file: str = "debug.log") -> logging.Logger:
     level = logging.DEBUG if DEBUG else logging.INFO
 
     logger = logging.getLogger(name)
     logger.setLevel(level)
 
+    # Console handler
     console_handler = logging.StreamHandler()
     console_handler.setLevel(level)
 
@@ -20,6 +23,29 @@ def get_logger(name: str) -> logging.Logger:
     )
     console_handler.setFormatter(formatter)
 
+    if DEBUG:
+        file_handler = logging.FileHandler(log_file)
+        file_handler.setLevel(level)
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
+
     logger.addHandler(console_handler)
 
     return logger
+
+
+# Signal handlers
+def handle_sigint(signal, frame):
+    logger = get_logger(__name__)
+    logger.info("SIGINT received. Terminating model training.")
+    sys.exit(0)
+
+
+def handle_sigtstp(signal, frame):
+    logger = get_logger(__name__)
+    logger.info("SIGTSTP received. Terminating model training.")
+    sys.exit(0)
+
+
+signal.signal(signal.SIGINT, handle_sigint)
+signal.signal(signal.SIGTSTP, handle_sigtstp)
