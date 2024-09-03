@@ -37,16 +37,30 @@ def train_models(
     feature_columns: list[str],
     save_models: bool = True,
 ) -> tuple[pd.DataFrame, str]:
+    """
+    Train models for each position and save the results.
 
+    Parameters:
+    - df_train: Training DataFrame
+    - df_test: Testing DataFrame
+    - feature_columns: List of feature column names
+    - save_models: Boolean flag to save models
+
+    Returns:
+    - model_performance_results: DataFrame with model performance results
+    - output_filepath: Path to the output directory
+    """
     def generate_output_dir() -> str:
         timestamp: str = pd.Timestamp.now().strftime("%Y%m%d%H%M%S")
         output_filepath: str = "output/" + timestamp + "/"
         os.makedirs(output_filepath, exist_ok=False)
         logger.info(f"Output directory created: {output_filepath}")
         return output_filepath
+    
+    if df_train.empty or df_test.empty:
+        raise ValueError("Training and testing DataFrames must be provided.")
 
     output_filepath = generate_output_dir()
-
     model_performance_results = {}
 
     for position in POSITIONS:
@@ -60,15 +74,22 @@ def train_models(
             save_models=save_models,
         )
 
-    model_performance_results = calculate_position_rmse(model_performance_results)
-    model_performance_results.to_csv(output_filepath + "/all_sets_rmse.csv")
+    model_performance_results_df = pd.DataFrame(model_performance_results).T
+    model_performance_results_df.index.name = "Position"
 
-    cv_model_perfomance_results = model_performance_results[
-        [col for col in model_performance_results.columns if "cross_val" in col]
+    model_performance_results_df = calculate_position_rmse(model_performance_results_df)
+    model_performance_results_df.to_csv(
+        os.path.join(output_filepath, "all_sets_rmse.csv")
+    )
+
+    cv_model_performance_results = model_performance_results_df[
+        [col for col in model_performance_results_df.columns if "cross_val" in col]
     ]
-    cv_model_perfomance_results.to_csv(output_filepath + "/cross_val_rmse.csv")
+    cv_model_performance_results.to_csv(
+        os.path.join(output_filepath, "cross_val_rmse.csv")
+    )
 
-    return model_performance_results, output_filepath
+    return model_performance_results_df, output_filepath
 
 
 def train_models_by_position(
@@ -78,7 +99,22 @@ def train_models_by_position(
     position: str,
     filepath: str,
     save_models: bool = True,
-):
+) -> dict:
+    """
+    Train models for a specific position.
+
+    Parameters:
+    - df_train: Training DataFrame
+    - df_test: Testing DataFrame
+    - feature_columns: List of feature column names
+    - position: Position to train models for
+    - filepath: Path to save models
+    - save_models: Boolean flag to save models
+
+    Returns:
+    - performance_results: Dictionary with model performance results
+    """
+
     logger.debug(f"[{position}] Selected features: {feature_columns}")
 
     # Defaults to filling with median. Other options for missing values are zero and mean.
@@ -175,8 +211,6 @@ def train_models_by_position(
         if save_models:
             model_path = os.path.join(filepath, f"{position}_{model_name}.joblib")
             joblib.dump(model, model_path)
-            logger.info(
-                f"[{position}] {model_name} saved to {model_path}"
-            )
+            logger.info(f"[{position}] {model_name} saved to {model_path}")
 
     return performance_results
