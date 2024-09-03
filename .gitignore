@@ -6,3 +6,4 @@ catboost_info
 *.pyc
 
 .DS_Store
+debug.log
