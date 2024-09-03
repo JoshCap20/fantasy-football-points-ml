@@ -25,7 +25,6 @@ import joblib
 import os
 
 from config import POSITIONS
-from evaluation import calculate_position_rmse
 
 
 logger = get_logger(__name__)
@@ -58,18 +57,25 @@ def train_models(
         logger.info(f"Output directory created: {output_filepath}")
         return output_filepath
 
-    if df_train.empty or df_test.empty:
-        raise ValueError("Training and testing DataFrames must be provided.")
+    def handle_missing_values(
+        df_train: pd.DataFrame, df_test: pd.DataFrame
+    ) -> tuple[pd.DataFrame, pd.DataFrame]:
+        # TODO: Inspect data to see where these missing values are coming from
+        if df_train.empty or df_test.empty:
+            raise ValueError("Training and testing DataFrames must be provided.")
+        if df_train.isnull().values.any() or df_test.isnull().values.any():
+            logger.info("Missing values detected.")
+            df_train = impute_missing_values_with_zero(df_train, feature_columns)
+            df_test = impute_missing_values_with_zero(df_test, feature_columns)
+        return df_train, df_test
 
-    df_train = drop_missing_values(df_train, feature_columns)
-    df_test = drop_missing_values(df_test, feature_columns)
-
+    df_train, df_test = handle_missing_values(df_train, df_test)
     output_filepath = generate_output_dir()
-    model_performance_results = {}
+    model_performance_results = []
 
     for position in POSITIONS:
-        logger.info(f"Training for position {position}")
-        model_performance_results[position] = train_models_by_position(
+        logger.info(f"[{position}] Training models...")
+        position_results = train_models_by_position(
             df_train=df_train,
             df_test=df_test,
             feature_columns=feature_columns,
@@ -78,19 +84,21 @@ def train_models(
             save_models=save_models,
         )
 
-    model_performance_results_df = pd.DataFrame(model_performance_results).T
-    model_performance_results_df.index.name = "Position"
+        for model_name, metrics in position_results.items():
+            flattened_results = {"Position": position, "Model": model_name}
+            flattened_results.update(metrics)
+            model_performance_results.append(flattened_results)
 
-    model_performance_results_df = calculate_position_rmse(model_performance_results_df)
+    model_performance_results_df = pd.DataFrame(model_performance_results)
     model_performance_results_df.to_csv(
-        os.path.join(output_filepath, "all_sets_rmse.csv")
+        os.path.join(output_filepath, "detailed_rmse.csv"), index=False
     )
 
-    cv_model_performance_results = model_performance_results_df[
-        [col for col in model_performance_results_df.columns if "cross_val" in col]
-    ]
-    cv_model_performance_results.to_csv(
-        os.path.join(output_filepath, "cross_val_rmse.csv")
+    cv_rmse_df = model_performance_results_df.pivot(
+        index="Position", columns="Model", values="cross_val_rmse"
+    )
+    cv_rmse_df.to_csv(
+        os.path.join(output_filepath, "cv_rmse_comparison.csv"), index=True
     )
 
     return model_performance_results_df, output_filepath
@@ -162,7 +170,7 @@ def train_models_by_position(
         # ),
     }
 
-    logger.debug(f"[{position}] Training with models: {models.keys()}")
+    logger.debug(f"[{position}] Training with models: {", ".join(models.keys())}")
 
     kf = KFold(n_splits=5, shuffle=True)
     train_data_by_position = df_train[df_train["position"] == position].copy()
