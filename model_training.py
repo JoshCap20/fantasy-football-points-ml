@@ -140,34 +140,34 @@ def train_models_by_position(
         # ),
         # "BayesianRidge": make_pipeline(StandardScaler(), BayesianRidge()),
         # **
-        # "ElasticNet": make_pipeline(
-        #     StandardScaler(), ElasticNetCV(cv=5, max_iter=10000)
-        # ),
-        # "GradientBoosting": GridSearchCV(
-        #     GradientBoostingRegressor(),
-        #     param_grid={
-        #         "max_depth": [3, 5, 10],
-        #         "n_estimators": [50, 100],
-        #         "learning_rate": [0.01, 0.1],
-        #     },
-        #     cv=5,
-        # ),
-        # "CatBoost": GridSearchCV(
-        #     cb.CatBoostRegressor(),
-        #     param_grid={"max_depth": [3, 5, 10], "n_estimators": [50, 100]},
-        #     cv=5,
-        # ),
+        "ElasticNet": make_pipeline(
+            StandardScaler(), ElasticNetCV(cv=5, max_iter=10000)
+        ),
+        "GradientBoosting": GridSearchCV(
+            GradientBoostingRegressor(),
+            param_grid={
+                "max_depth": [3, 5, 10],
+                "n_estimators": [50, 100],
+                "learning_rate": [0.01, 0.1],
+            },
+            cv=5,
+        ),
+        "CatBoost": GridSearchCV(
+            cb.CatBoostRegressor(),
+            param_grid={"max_depth": [3, 5, 10], "n_estimators": [50, 100]},
+            cv=5,
+        ),
         "RandomForest": GridSearchCV(
             RandomForestRegressor(),
             param_grid={"max_depth": [3, 5, 10], "n_estimators": [50, 100]},
             cv=5,
         ),
         # **
-        # "KNN": GridSearchCV(
-        #     KNeighborsRegressor(),
-        #     param_grid={"n_neighbors": [3, 5, 10]},
-        #     cv=5,
-        # ),
+        "KNN": GridSearchCV(
+            KNeighborsRegressor(),
+            param_grid={"n_neighbors": [3, 5, 10]},
+            cv=5,
+        ),
     }
 
     logger.debug(f"[{position}] Training with models: {", ".join(models.keys())}")

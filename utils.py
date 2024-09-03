@@ -37,13 +37,13 @@ def get_logger(name: str, log_file: str = "debug.log") -> logging.Logger:
 # Signal handlers
 def handle_sigint(signal, frame):
     logger = get_logger(__name__)
-    logger.info("SIGINT received. Terminating model training.")
+    logger.info("\nSIGINT received. Terminating model training.")
     sys.exit(0)
 
 
 def handle_sigtstp(signal, frame):
     logger = get_logger(__name__)
-    logger.info("SIGTSTP received. Terminating model training.")
+    logger.info("\nSIGTSTP received. Terminating model training.")
     sys.exit(0)
 
 
