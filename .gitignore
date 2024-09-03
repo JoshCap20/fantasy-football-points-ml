@@ -1,9 +1,9 @@
 .venv
 .testing
+output
 catboost_info
 
 *.pyc
 
 .DS_Store
-
-output/models/*
+debug.log

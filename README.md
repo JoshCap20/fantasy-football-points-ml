@@ -2,15 +2,17 @@
 
 Fantasy is right around the corner so I'll go ahead and open source this for others to use and contribute to. You can change what years are used for training and testing data by changing the `TRAIN_YEARS` and `TEST_YEARS` variables in the `config.py` file. It will automatically scrape the data for the years you specify and train the models.
 
+This is a work in progress. Better features or indicators should be tried in `feature_engineering.py`. More models can be added to the `models` dictionary in `model_training.py`. The model perfomance will be outputted in the `output` folder.This project is very modularized so building ontop of it should be easy.
+
 ## Perfomance
 
-### RMSE by Position grouped by Model
+### Cross-Validation RMSE by Model and Position
 
-![RMSE for each Position by Model](./output/position_rmse_comparison_by_model.png)
+![Cross-Validation RMSE by Model and Position](./output/20240903014914/cv_rmse_comparison_by_model.png)
 
-### RSME Distribution by Model
+### Aggregated RSME Distribution by Model
 
-![RMSE Distribution by Model](./output/rmse_distribution_by_model.png)
+![Aggregated RMSE Distribution by Model](./output/20240903014914/rmse_distribution_by_model.png)
 
 ## Models
 
@@ -42,24 +44,20 @@ Then run the following command:
 python main.py
 ```
 
-The model will train and test on the years specified in the `config.py` file. The results will be outputed to the `output` folder.
+The model will train and test on the years specified in the `config.py` file. The results will be outputed in the `output` folder with a given timestamp. The results include graphs and information about each models perfomance on the data, in addition to the models themselves.
 
-## Validation - DEPRECATED
+Sample output is provided by default in the `output` folder, except the actual models themselves which were omitted due to size.
 
-*While this still works, it is automatically ran after the main file is ran now.*  
+## Validation
 
-After running the main file, the model's accuracy is outputed by position and model in results/rmse.csv. The RMSE is calculated by taking the square root of the mean of the squared differences between the predicted and actual values. The RMSE is used to determine the accuracy of the models.
+The model is validated using a 5-fold cross-validation. The RMSE is calculated for each fold and then averaged to get the final RMSE for the model. The RMSE is then compared to the other models to see which one performs the best.
 
-To visualize the results of the models like the above, run the following command:
-
-```bash
-python analyze.py
-```
-
-## TODO
-
-- Combine models for each position into one model for each position.
+RMSE is calculated by taking the square root of the average of the squared differences between the predicted and actual values on the training dataset.
 
 ## Data
 
-Data is dynamically scraped for input years from the nfl_data_py package. The data is then cleaned, aggregated, and transformed to be used in the models.
+Data is dynamically scraped for input years from the nfl_data_py package. The data is then cleaned, aggregated, and transformed to be used in the models. Some of the data used is saved to file to act as a local cache in `data/`. This is also for others to use since the data is not easily accessible like college basketball data.
+
+Feature engineer includes creating rolling averages for each stats for each player over differing timeframes (last game, 4 games, season).
+
+Null data is imputed with zeros by default, but this can be tweaked in `model_training.py`.

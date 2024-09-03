@@ -76,7 +76,7 @@ def add_features(df: pd.DataFrame) -> pd.DataFrame:
     df["fantasy_points_lag1"] = df.groupby("player_id")["fantasy_points"].shift(1)
     df["fantasy_points_lag2"] = df.groupby("player_id")["fantasy_points"].shift(2)
 
-    # Since these are kept in the model, only add non-target features to feature_names
+    # Since these are kept in the model, only add non-target features to feature_names (realized this mistake after getting 2 RMSE)
     feature_names = [
         "fantasy_points_lag1",
         "fantasy_points_lag2",
@@ -85,7 +85,7 @@ def add_features(df: pd.DataFrame) -> pd.DataFrame:
     return df, feature_names
 
 
-def create_features(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
+def create_feature_columns(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
     df, feature_names = add_features(df)
 
     # These stats are averaged over the season, last 4 weeks, and previous week

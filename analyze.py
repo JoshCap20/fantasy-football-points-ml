@@ -1,147 +1,105 @@
+import os
+import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import pandas as pd
 import seaborn as sns
+from utils import get_logger
 from sklearn.model_selection import learning_curve
+
+logger = get_logger(__name__)
 
 
 class FantasyFootballAnalysis:
-    def __init__(self, path="output/"):
+    def __init__(self, df: pd.DataFrame, path: str = "output/"):
         self.path = path
-        self.df = pd.read_csv(self.path + "position_rmse.csv")
-        self.df.set_index("Model", inplace=True)
-        self.base_models = sorted(set(model.split("_")[0] for model in self.df.index))
+        self.df = df
+
+        if self.df.index.name != "Position":
+            self.df.set_index("Position", inplace=True)
+
+        self.models = self.df["Model"].unique()
 
     def autolabel(self, rects, ax):
+        """Attach a text label above each bar displaying its height."""
         for rect in rects:
             height = rect.get_height()
             ax.text(
                 rect.get_x() + rect.get_width() / 2.0,
-                1.05 * height,
+                height + 0.02,
                 f"{height:.3f}",
                 ha="center",
                 va="bottom",
             )
 
-    # def find_best_estimator(self):
-    #     min_rmse_by_position = {}
-    #     print("The best estimator for each position with the lowest RMSE is:\n")
-    #     for position in self.df.columns[1:]:
-    #         min_rmse = self.df[position].min()
-    #         min_rmse_index = self.df[position].idxmin()
-    #         min_rmse_algo = self.df.iloc[min_rmse_index, 0]
-    #         min_rmse_by_position[position] = min_rmse
-    #         print(f"{position}: {min_rmse_algo} with RMSE: {min_rmse:.3f}")
-    #     return min_rmse_by_position
-
     def plot_rmse_by_model_and_position(self):
-        num_positions = len(self.df.columns)
-        fig, axes = plt.subplots(num_positions, 1, figsize=(14, num_positions * 5))
+        """Plot CV RMSE by model and position in a single grouped bar chart."""
 
-        if num_positions == 1:
-            axes = [axes]
+        fig, ax = plt.subplots(figsize=(14, 7))
 
-        colors = {"train": "blue", "test": "orange", "cv": "green"}
+        positions = self.df.index.unique()
+        num_positions = len(positions)
+        num_models = len(self.models)
+        bar_width = 0.8 / num_models
 
-        for ax, position in zip(axes, self.df.columns):
-            data = {}
-            for base_model in self.base_models:
-                data[base_model] = self.df.loc[
-                    [
-                        f"{base_model}_train_rmse",
-                        f"{base_model}_test_rmse",
-                        f"{base_model}_cv_rmse",
-                    ],
-                    position,
-                ].values
+        indices = np.arange(num_positions)
 
-            ind = np.arange(len(self.base_models))
-            width = 0.2
-            for i, (base_model, values) in enumerate(data.items()):
-                rects_train = ax.bar(
-                    ind[i] - width,
-                    values[0],
-                    width,
-                    color=colors["train"],
-                    label="Train" if i == 0 else "",
-                )
-                rects_test = ax.bar(
-                    ind[i],
-                    values[1],
-                    width,
-                    color=colors["test"],
-                    label="Test" if i == 0 else "",
-                )
-                rects_cv = ax.bar(
-                    ind[i] + width,
-                    values[2],
-                    width,
-                    color=colors["cv"],
-                    label="CV" if i == 0 else "",
-                )
+        for i, model in enumerate(self.models):
+            data = self.df[self.df["Model"] == model]
+            ax.bar(
+                indices + i * bar_width,
+                data["cross_val_rmse"],
+                width=bar_width,
+                label=model,
+                alpha=0.7,
+            )
 
-                self.autolabel(rects_train, ax)
-                self.autolabel(rects_test, ax)
-                self.autolabel(rects_cv, ax)
+        ax.set_xticks(indices + bar_width * (num_models - 1) / 2)
+        ax.set_xticklabels(positions, rotation=20, ha="right", fontsize=10)
 
-            ax.set_ylabel("RMSE")
-            ax.set_title(f"RMSE by Model for Position: {position}", fontsize=14, pad=20)
-            ax.set_xticks(ind)
-            ax.set_xticklabels(self.base_models, rotation=20, ha="right", fontsize=10)
+        ax.set_ylabel("CV RMSE")
+        ax.set_title("Cross-Validation RMSE by Model and Position", fontsize=16, pad=20)
+        ax.legend()
 
-        handles, labels = axes[0].get_legend_handles_labels()
-        fig.legend(handles, labels, loc="upper center", ncol=3, fontsize=12)
-
-        plt.tight_layout(rect=[0, 0, 1, 0.95])
-        plt.subplots_adjust(hspace=0.5)
-        plt.savefig(self.path + "position_rmse_comparison_by_model.png", dpi=300)
+        plt.tight_layout()
+        plt.savefig(os.path.join(self.path, "cv_rmse_comparison_by_model.png"), dpi=300)
         plt.show()
 
     def plot_rmse_distribution(self):
-        boxplot_data = []
-        for base_model in self.base_models:
-            for metric in ["train_rmse", "test_rmse", "cv_rmse"]:
-                boxplot_data.append(
-                    {
-                        "Model": base_model,
-                        "Metric": metric,
-                        "RMSE": self.df.loc[f"{base_model}_{metric}", :].values,
-                    }
-                )
+        """Plot RMSE distribution by model and metric."""
+        metrics = ["train_rmse", "test_rmse", "cross_val_rmse"]
+        melted_df = pd.melt(
+            self.df,
+            id_vars=["Model"],
+            value_vars=metrics,
+            var_name="Metric",
+            value_name="RMSE",
+        )
 
-        boxplot_df = pd.DataFrame(boxplot_data)
         plt.figure(figsize=(14, 8))
-        sns.boxplot(x="Model", y="RMSE", hue="Metric", data=boxplot_df.explode("RMSE"))
-        plt.title("RMSE Distribution by Model and Metric")
+        sns.boxplot(x="Model", y="RMSE", hue="Metric", data=melted_df)
+        plt.title("Aggregated RMSE Distribution by Model and Metric")
         plt.ylabel("RMSE")
         plt.xlabel("Model")
         plt.legend(loc="upper right")
         plt.xticks(rotation=45)
         plt.tight_layout()
-        plt.savefig(self.path + "rmse_distribution_by_model.png", dpi=300)
+        plt.savefig(os.path.join(self.path, "rmse_distribution_by_model.png"), dpi=300)
         plt.show()
 
-    def plot_feature_correlation_heatmap(self, train_df):
-        correlation_matrix = train_df.corr()
+    def plot_feature_correlation_heatmap(self, df_features: pd.DataFrame):
+        """Plot a heatmap of feature correlations."""
+        correlation_matrix = df_features.corr()
         plt.figure(figsize=(16, 12))
         sns.heatmap(correlation_matrix, annot=False, cmap="coolwarm", fmt=".2f")
         plt.title("Feature Correlation Heatmap")
         plt.tight_layout()
-        plt.savefig(self.path + "feature_correlation_heatmap.png", dpi=300)
+        plt.savefig(os.path.join(self.path, "feature_correlation_heatmap.png"), dpi=300)
         plt.show()
 
-    def plot_learning_curve(
-        self,
-        estimator,
-        title,
-        X,
-        y,
-        cv=None,
-        n_jobs=-1,
-        train_sizes=np.linspace(0.1, 1.0, 5),
-    ):
+    def plot_learning_curve(self, estimator, X, y, cv=None):
+        """Plot a learning curve for the given estimator."""
         plt.figure(figsize=(10, 6))
-        plt.title(title)
+        plt.title(f"Learning Curve: {type(estimator).__name__}")
         plt.xlabel("Training examples")
         plt.ylabel("RMSE")
 
@@ -150,8 +108,8 @@ class FantasyFootballAnalysis:
             X,
             y,
             cv=cv,
-            n_jobs=n_jobs,
-            train_sizes=train_sizes,
+            n_jobs=-1,
+            train_sizes=np.linspace(0.1, 1.0, 5),
             scoring="neg_root_mean_squared_error",
         )
 
@@ -172,34 +130,57 @@ class FantasyFootballAnalysis:
 
         plt.legend(loc="best")
         plt.tight_layout()
-        plt.savefig(self.path + f"learning_curve_{title}.png", dpi=300)
+        plt.savefig(
+            os.path.join(self.path, f"learning_curve_{type(estimator).__name__}.png"),
+            dpi=300,
+        )
         plt.show()
 
-    def plot_rmse_across_years(self, rmse_across_years):
+    def plot_rmse_across_years(self, rmse_across_years: dict):
+        """Plot RMSE comparison across different years."""
         plt.figure(figsize=(14, 8))
         for year, rmse in rmse_across_years.items():
-            plt.plot(self.base_models, rmse, label=f"RMSE for {year}")
+            plt.plot(self.models, rmse, label=f"RMSE for {year}")
 
         plt.title("Comparison of RMSE Across Years")
         plt.ylabel("RMSE")
         plt.xlabel("Model")
         plt.legend()
         plt.tight_layout()
-        plt.savefig(self.path + "rmse_comparison_across_years.png", dpi=300)
+        plt.savefig(
+            os.path.join(self.path, "rmse_comparison_across_years.png"), dpi=300
+        )
         plt.show()
 
 
-def run_analysis():
-    analysis = FantasyFootballAnalysis()
-    # analysis.find_best_estimator()
-    # analysis.compare_rmse()
+def run_analysis(df: pd.DataFrame | None = None, path: str | None = None):
+    if path:
+        analysis = FantasyFootballAnalysis(df=df, path=path)
+    else:
+        analysis = FantasyFootballAnalysis(df=df)
+
     analysis.plot_rmse_by_model_and_position()
     analysis.plot_rmse_distribution()
-    # Assume `train_df` is the DataFrame with your features for the heatmap#
-    # analysis.plot_feature_correlation_heatmap(train_df)# Assume `estimator`, `X`, and `y` are def ined for the learning curve#
-    # analysis.plot_learning_curve(estimator, "ModelName", X, y)# Assume `rmse_across_years` is a dict of year: RMSE list#
+    # Example usage:
+    # df_features should be a DataFrame containing the features for heatmap visualization
+    # analysis.plot_feature_correlation_heatmap(df_features)
+    # Example for learning curve:
+    # analysis.plot_learning_curve(estimator, X, y, cv=5)
+    # Example for RMSE across years:
     # analysis.plot_rmse_across_years(rmse_across_years)
 
 
 if __name__ == "__main__":
-    run_analysis()
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Fantasy Football Analysis")
+    parser.add_argument(
+        "--csv",
+        type=str,
+        help="Path to the CSV file containing RMSE data",
+        required=True,
+    )
+    args = parser.parse_args()
+
+    df = pd.read_csv(args.csv)
+    run_analysis(df)
