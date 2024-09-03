@@ -8,16 +8,16 @@ from sklearn.model_selection import learning_curve
 
 logger = get_logger(__name__)
 
+
 class FantasyFootballAnalysis:
     def __init__(self, df: pd.DataFrame, path: str = "output/"):
         self.path = path
         self.df = df
-        logger.debug(f"Columns in the DataFrame: {self.df.columns}")
 
         if self.df.index.name != "Position":
-            self.df.set_index('Position', inplace=True)
-        
-        self.models = self.df['Model'].unique()
+            self.df.set_index("Position", inplace=True)
+
+        self.models = self.df["Model"].unique()
 
     def autolabel(self, rects, ax):
         """Attach a text label above each bar displaying its height."""
@@ -32,41 +32,52 @@ class FantasyFootballAnalysis:
             )
 
     def plot_rmse_by_model_and_position(self):
-        """Plot CV RMSE by model and position in a single graph."""
-        
+        """Plot CV RMSE by model and position in a single grouped bar chart."""
+
         fig, ax = plt.subplots(figsize=(14, 7))
-        
-        for model in self.models:
-            data = self.df[self.df['Model'] == model]
+
+        positions = self.df.index.unique()
+        num_positions = len(positions)
+        num_models = len(self.models)
+        bar_width = 0.8 / num_models
+
+        indices = np.arange(num_positions)
+
+        for i, model in enumerate(self.models):
+            data = self.df[self.df["Model"] == model]
             ax.bar(
-                data.index,
-                data['cross_val_rmse'],
-                width=0.3,
+                indices + i * bar_width,
+                data["cross_val_rmse"],
+                width=bar_width,
                 label=model,
-                alpha=0.7
+                alpha=0.7,
             )
-        
+
+        ax.set_xticks(indices + bar_width * (num_models - 1) / 2)
+        ax.set_xticklabels(positions, rotation=20, ha="right", fontsize=10)
+
         ax.set_ylabel("CV RMSE")
         ax.set_title("Cross-Validation RMSE by Model and Position", fontsize=16, pad=20)
-        ax.set_xticks(np.arange(len(self.df.index)))
-        ax.set_xticklabels(self.df.index, rotation=20, ha="right", fontsize=10)
         ax.legend()
 
         plt.tight_layout()
-        plt.savefig(
-            os.path.join(self.path, "cv_rmse_comparison_by_model.png"), dpi=300
-        )
+        plt.savefig(os.path.join(self.path, "cv_rmse_comparison_by_model.png"), dpi=300)
         plt.show()
-
 
     def plot_rmse_distribution(self):
         """Plot RMSE distribution by model and metric."""
         metrics = ["train_rmse", "test_rmse", "cross_val_rmse"]
-        melted_df = pd.melt(self.df, id_vars=["Model"], value_vars=metrics, var_name="Metric", value_name="RMSE")
+        melted_df = pd.melt(
+            self.df,
+            id_vars=["Model"],
+            value_vars=metrics,
+            var_name="Metric",
+            value_name="RMSE",
+        )
 
         plt.figure(figsize=(14, 8))
         sns.boxplot(x="Model", y="RMSE", hue="Metric", data=melted_df)
-        plt.title("RMSE Distribution by Model and Metric")
+        plt.title("Aggregated RMSE Distribution by Model and Metric")
         plt.ylabel("RMSE")
         plt.xlabel("Model")
         plt.legend(loc="upper right")
