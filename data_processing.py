@@ -55,7 +55,7 @@ def load_data(years: list[int], filepath: str = "data") -> pd.DataFrame:
         weekly_df = load_weekly_data(year, filepath)
         schedule_df = load_schedule_data(year, filepath)
 
-        weekly_df = weekly_df[weekly_df["position"].isin(POSITIONS)]
+        # weekly_df = weekly_df[weekly_df["position"].isin(POSITIONS)]
 
         merged_df = pd.merge(
             weekly_df,
@@ -70,34 +70,34 @@ def load_data(years: list[int], filepath: str = "data") -> pd.DataFrame:
     return combined_df.copy()
 
 
-def drop_missing_values(df: pd.DataFrame, features: list[str]) -> pd.DataFrame:
-    logger.debug(f"Dropping missing values from features: {features}")
-    df = df.dropna(subset=features)
+def drop_missing_values(df: pd.DataFrame, feature_columns: list[str]) -> pd.DataFrame:
+    logger.debug(f"Dropping missing values")
+    df = df.dropna(subset=feature_columns)
     return df
 
 
 def impute_missing_values_with_mean(
-    df: pd.DataFrame, features: list[str]
+    df: pd.DataFrame, feature_columns: list[str]
 ) -> pd.DataFrame:
-    logger.debug(f"Imputing missing values with mean for features: {features}")
+    logger.debug(f"Imputing missing values with mean")
     imputer = SimpleImputer(strategy="mean")
-    df[features] = imputer.fit_transform(df[features])
+    df[feature_columns] = imputer.fit_transform(df[feature_columns])
     return df
 
 
 def impute_missing_values_with_median(
-    df: pd.DataFrame, features: list[str]
+    df: pd.DataFrame, feature_columns: list[str]
 ) -> pd.DataFrame:
-    logger.debug(f"Imputing missing values with median for features: {features}")
+    logger.debug(f"Imputing missing values with median")
     imputer = SimpleImputer(strategy="median")
-    df[features] = imputer.fit_transform(df[features])
+    df[feature_columns] = imputer.fit_transform(df[feature_columns])
     return df
 
 
 def impute_missing_values_with_zero(
-    df: pd.DataFrame, features: list[str]
+    df: pd.DataFrame, feature_columns: list[str]
 ) -> pd.DataFrame:
-    logger.debug(f"Imputing missing values with zero for features: {features}")
+    logger.debug(f"Imputing missing values with zero")
     imputer = SimpleImputer(strategy="constant", fill_value=0)
-    df[features] = imputer.fit_transform(df[features])
+    df[feature_columns] = imputer.fit_transform(df[feature_columns])
     return df

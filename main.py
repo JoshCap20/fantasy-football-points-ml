@@ -5,7 +5,7 @@ Abstracts data cleaning, data processing, feature engineering, model training, a
 """
 
 from data_processing import load_data
-from feature_engineering import create_features
+from feature_engineering import create_feature_columns
 from model_training import train_models
 from utils import get_logger
 from config import TRAIN_YEARS, TEST_YEARS
@@ -19,15 +19,15 @@ def main():
     test_df = load_data(TEST_YEARS)
     logger.info("Data loaded and processed successfully")
 
-    train_df, features = create_features(train_df)
-    test_df, _ = create_features(test_df)
-    logger.info("Features created successfully")
+    train_df, feature_columns = create_feature_columns(train_df)
+    test_df, _ = create_feature_columns(test_df)
+    logger.info("Feature engineering finished normally")
 
-    train_models(train_df, test_df, features)
-    logger.info("Program finished normally")
+    results_df, output_filepath = train_models(train_df, test_df, feature_columns)
+    logger.info("Model training finished normally")
 
-    run_analysis()
-    logger.info("Analysis completed")
+    run_analysis(df=results_df, path=output_filepath)
+    logger.info("Model perfomance analysis finished normally")
 
 
 if __name__ == "__main__":

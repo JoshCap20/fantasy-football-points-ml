@@ -85,7 +85,7 @@ def add_features(df: pd.DataFrame) -> pd.DataFrame:
     return df, feature_names
 
 
-def create_features(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
+def create_feature_columns(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
     df, feature_names = add_features(df)
 
     # These stats are averaged over the season, last 4 weeks, and previous week
