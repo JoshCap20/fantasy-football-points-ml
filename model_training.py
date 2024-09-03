@@ -36,22 +36,39 @@ def train_models(
     df_test: pd.DataFrame,
     feature_columns: list[str],
     save_models: bool = True,
-) -> pd.DataFrame:
-    timestamp: str = pd.Timestamp.now().strftime("%Y%m%d%H%M%S")
+) -> tuple[pd.DataFrame, str]:
+
+    def generate_output_dir() -> str:
+        timestamp: str = pd.Timestamp.now().strftime("%Y%m%d%H%M%S")
+        output_filepath: str = "output/" + timestamp + "/"
+        os.makedirs(output_filepath, exist_ok=False)
+        logger.info(f"Output directory created: {output_filepath}")
+        return output_filepath
+
+    output_filepath = generate_output_dir()
 
     model_performance_results = {}
 
     for position in POSITIONS:
         logger.info(f"Training for position {position}")
         model_performance_results[position] = train_models_by_position(
-            df_train, df_test, feature_columns, position, save_models, suffix=timestamp
+            df_train=df_train,
+            df_test=df_test,
+            feature_columns=feature_columns,
+            position=position,
+            filepath=output_filepath,
+            save_models=save_models,
         )
 
     model_performance_results = calculate_position_rmse(model_performance_results)
-    model_performance_results.to_csv(
-        f"output/rmse_{timestamp}.csv", header=True, index=True
-    )
-    return model_performance_results
+    model_performance_results.to_csv(output_filepath + "/all_sets_rmse.csv")
+
+    cv_model_perfomance_results = model_performance_results[
+        [col for col in model_performance_results.columns if "cross_val" in col]
+    ]
+    cv_model_perfomance_results.to_csv(output_filepath + "/cross_val_rmse.csv")
+
+    return model_performance_results, output_filepath
 
 
 def train_models_by_position(
@@ -59,14 +76,14 @@ def train_models_by_position(
     df_test: pd.DataFrame,
     feature_columns: list[str],
     position: str,
+    filepath: str,
     save_models: bool = True,
-    suffix: str = "",
 ):
-    logger.debug(f"Selected features: {feature_columns}")
+    logger.debug(f"[{position}] Selected features: {feature_columns}")
 
     # Defaults to filling with median. Other options for missing values are zero and mean.
-    df_train = drop_missing_values(df_train.copy(), feature_columns)
-    df_test = drop_missing_values(df_test.copy(), feature_columns)
+    df_train = impute_missing_values_with_zero(df_train.copy(), feature_columns)
+    df_test = impute_missing_values_with_zero(df_test.copy(), feature_columns)
 
     models = {
         # Remove these three prob
@@ -79,45 +96,43 @@ def train_models_by_position(
         # ),
         # "BayesianRidge": make_pipeline(StandardScaler(), BayesianRidge()),
         # **
-        "ElasticNet": make_pipeline(
-            StandardScaler(), ElasticNetCV(cv=5, max_iter=10000)
-        ),
-        "GradientBoosting": GridSearchCV(
-            GradientBoostingRegressor(),
-            param_grid={
-                "max_depth": [3, 5, 10],
-                "n_estimators": [50, 100],
-                "learning_rate": [0.01, 0.1],
-            },
-            cv=5,
-        ),
-        "CatBoost": GridSearchCV(
-            cb.CatBoostRegressor(),
-            param_grid={"max_depth": [3, 5, 10], "n_estimators": [50, 100]},
-            cv=5,
-        ),
+        # "ElasticNet": make_pipeline(
+        #     StandardScaler(), ElasticNetCV(cv=5, max_iter=10000)
+        # ),
+        # "GradientBoosting": GridSearchCV(
+        #     GradientBoostingRegressor(),
+        #     param_grid={
+        #         "max_depth": [3, 5, 10],
+        #         "n_estimators": [50, 100],
+        #         "learning_rate": [0.01, 0.1],
+        #     },
+        #     cv=5,
+        # ),
+        # "CatBoost": GridSearchCV(
+        #     cb.CatBoostRegressor(),
+        #     param_grid={"max_depth": [3, 5, 10], "n_estimators": [50, 100]},
+        #     cv=5,
+        # ),
         "RandomForest": GridSearchCV(
             RandomForestRegressor(),
             param_grid={"max_depth": [3, 5, 10], "n_estimators": [50, 100]},
             cv=5,
         ),
         # **
-        "KNN": GridSearchCV(
-            KNeighborsRegressor(),
-            param_grid={"n_neighbors": [3, 5, 10]},
-            cv=5,
-        ),
+        # "KNN": GridSearchCV(
+        #     KNeighborsRegressor(),
+        #     param_grid={"n_neighbors": [3, 5, 10]},
+        #     cv=5,
+        # ),
     }
 
-    logger.debug(f"Training with models: {models.keys()}")
+    logger.debug(f"[{position}] Training with models: {models.keys()}")
 
     kf = KFold(n_splits=5, shuffle=True)
     train_data_by_position = df_train[df_train["position"] == position].copy()
     test_data_by_position = df_test[df_test["position"] == position].copy()
 
     performance_results = {}
-    model_dir = "output/models/"
-    os.makedirs(model_dir, exist_ok=True)
 
     for model_name, model in models.items():
         cv_scores = cross_val_score(
@@ -158,10 +173,7 @@ def train_models_by_position(
         )
 
         if save_models:
-            os.makedirs(os.path.join(model_dir, position), exist_ok=True)
-            model_path = os.path.join(
-                model_dir, f"{position}/{model_name}_{suffix}.joblib"
-            )
+            model_path = os.path.join(filepath, model_name + ".joblib")
             joblib.dump(model, model_path)
             logger.info(
                 f"Model {model_name} for position {position} saved to {model_path}"
