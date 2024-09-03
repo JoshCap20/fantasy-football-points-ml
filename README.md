@@ -46,6 +46,8 @@ python main.py
 
 The model will train and test on the years specified in the `config.py` file. The results will be outputed in the `output` folder with a given timestamp. The results include graphs and information about each models perfomance on the data, in addition to the models themselves.
 
+Sample output is provided by default in the `output` folder, except the actual models themselves which were omitted due to size.
+
 ## Validation
 
 The model is validated using a 5-fold cross-validation. The RMSE is calculated for each fold and then averaged to get the final RMSE for the model. The RMSE is then compared to the other models to see which one performs the best.
