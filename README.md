@@ -2,17 +2,17 @@
 
 Fantasy is right around the corner so I'll go ahead and open source this for others to use and contribute to. You can change what years are used for training and testing data by changing the `TRAIN_YEARS` and `TEST_YEARS` variables in the `config.py` file. It will automatically scrape the data for the years you specify and train the models.
 
-This is a work in progress. Better features or indicators should be tried in `feature_engineering.py`. More models can be added to the `models` dictionary in `model_training.py`. The model perfomance will be outputted in the `output` folder. Many changes have happened since `analyze.py` and the `analysis/model.ipynb` notebook, so future updates will fix those (not a current focus, but some intitution can fix them for personal use).
+This is a work in progress. Better features or indicators should be tried in `feature_engineering.py`. More models can be added to the `models` dictionary in `model_training.py`. The model perfomance will be outputted in the `output` folder. Many changes have happened since `analyze.py` and the `analysis/model.ipynb` notebook, so future updates will fix those (not a current focus, but some intitution can fix them for personal use). This project is very modularized so building ontop of it should be easy.
 
 ## Perfomance
 
-### RMSE by Position grouped by Model
+### Cross-Validation RMSE by Model and Position
 
-![RMSE for each Position by Model](./output/position_rmse_comparison_by_model.png)
+![Cross-Validation RMSE by Model and Position](./output/20240903014914/cv_rmse_comparison_by_model.png)
 
-### RSME Distribution by Model
+### Aggregated RSME Distribution by Model
 
-![RMSE Distribution by Model](./output/rmse_distribution_by_model.png)
+![Aggregated RMSE Distribution by Model](./output/20240903014914/rmse_distribution_by_model.png)
 
 ## Models
 
