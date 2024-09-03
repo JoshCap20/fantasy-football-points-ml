@@ -2,6 +2,8 @@
 
 Fantasy is right around the corner so I'll go ahead and open source this for others to use and contribute to. You can change what years are used for training and testing data by changing the `TRAIN_YEARS` and `TEST_YEARS` variables in the `config.py` file. It will automatically scrape the data for the years you specify and train the models.
 
+This is a work in progress. Better features or indicators should be tried in `feature_engineering.py`. More models can be added to the `models` dictionary in `model_training.py`. The model perfomance will be outputted in the `output` folder.
+
 ## Perfomance
 
 ### RMSE by Position grouped by Model
@@ -42,23 +44,7 @@ Then run the following command:
 python main.py
 ```
 
-The model will train and test on the years specified in the `config.py` file. The results will be outputed to the `output` folder. The results include graphs and information about each models perfomance on the data. In `output/models/`, each model is saved by position and model name as a pickle file for future use.
-
-## Validation - DEPRECATED
-
-*While this still works, it is automatically ran after the main file is ran now.*  
-
-After running the main file, the model's accuracy is outputed by position and model in results/rmse.csv. The RMSE is calculated by taking the square root of the mean of the squared differences between the predicted and actual values. The RMSE is used to determine the accuracy of the models.
-
-To visualize the results of the models like the above, run the following command:
-
-```bash
-python analyze.py
-```
-
-## TODO
-
-- Combine models for each position into one model for each position.
+The model will train and test on the years specified in the `config.py` file. The results will be outputed in the `output` folder. The results include graphs and information about each models perfomance on the data.
 
 ## Data
 
