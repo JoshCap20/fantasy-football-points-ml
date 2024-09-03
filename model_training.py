@@ -213,7 +213,7 @@ def train_models_by_position(
         }
 
         logger.info(
-            f"Position: {position}, Model: {model_name}, Train RMSE: {train_rmse}, Test RMSE: {test_rmse}, Cross-Validation RMSE: {cross_val_rmse}"
+            f"[{position}-{model_name}] Perfomance Overview\n\tTrain RMSE: {train_rmse}\n\tTest RMSE: {test_rmse}\n\tCross-Validation RMSE: {cross_val_rmse}"
         )
 
         if save_models:
