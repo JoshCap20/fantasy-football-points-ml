@@ -50,15 +50,19 @@ def train_models(
     - model_performance_results: DataFrame with model performance results
     - output_filepath: Path to the output directory
     """
+
     def generate_output_dir() -> str:
         timestamp: str = pd.Timestamp.now().strftime("%Y%m%d%H%M%S")
         output_filepath: str = "output/" + timestamp + "/"
         os.makedirs(output_filepath, exist_ok=False)
         logger.info(f"Output directory created: {output_filepath}")
         return output_filepath
-    
+
     if df_train.empty or df_test.empty:
         raise ValueError("Training and testing DataFrames must be provided.")
+
+    df_train = drop_missing_values(df_train, feature_columns)
+    df_test = drop_missing_values(df_test, feature_columns)
 
     output_filepath = generate_output_dir()
     model_performance_results = {}
@@ -116,10 +120,6 @@ def train_models_by_position(
     """
 
     logger.debug(f"[{position}] Selected features: {feature_columns}")
-
-    # Defaults to filling with median. Other options for missing values are zero and mean.
-    df_train = impute_missing_values_with_zero(df_train.copy(), feature_columns)
-    df_test = impute_missing_values_with_zero(df_test.copy(), feature_columns)
 
     models = {
         # Remove these three prob
