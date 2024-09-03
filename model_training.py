@@ -173,10 +173,10 @@ def train_models_by_position(
         )
 
         if save_models:
-            model_path = os.path.join(filepath, model_name + ".joblib")
+            model_path = os.path.join(filepath, f"{position}_{model_name}.joblib")
             joblib.dump(model, model_path)
             logger.info(
-                f"Model {model_name} for position {position} saved to {model_path}"
+                f"[{position}] {model_name} saved to {model_path}"
             )
 
     return performance_results
