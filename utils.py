@@ -1,11 +1,14 @@
 """
 Utils
+
+Provides utility functions for logging and signal handling.
 """
 
-from config import DEBUG
-import logging
-import signal
 import sys
+import signal
+import logging
+
+from config import DEBUG
 
 
 def get_logger(name: str, log_file: str = "debug.log") -> logging.Logger:

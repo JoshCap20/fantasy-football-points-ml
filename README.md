@@ -4,6 +4,10 @@ This machine learning model predicts player points in PPR (Points Per Reception)
 
 You can customize feature engineering in feature_engineering.py and modify or add new models via the models dictionary in `model_training.py`. All outputs, including model performance analysis, will be saved in the output directory.
 
+Multiple machine learning models are implemented and compared to identify the best-performing model for predicting fantasy football points. The model is validated using 5-fold cross-validation, and the results are visualized for easy comparison.
+
+Much of the data used is included by default in `data/` for others to use for their own projects. You can still use years not included by default by updating the `config.py` file and these will be scraped and saved locally automatically.
+
 ## Performance Overview
 
 The following results showcase the model's default performance using 2022 data for training and 2023 data for testing (predicted PPR points). You can easily modify these settings in config.py. Data for the specified years will be automatically scraped if it's not already available locally.
