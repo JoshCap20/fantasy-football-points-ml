@@ -1,10 +1,12 @@
-# Fantasy Football Points Prediction ML Model
+# Fantasy Football PPR Points Prediction Model
 
-Fantasy is right around the corner so I'll go ahead and open source this for others to use and contribute to. You can change what years are used for training and testing data by changing the `TRAIN_YEARS` and `TEST_YEARS` variables in the `config.py` file. It will automatically scrape the data for the years you specify and train the models.
+This machine learning model predicts player points in PPR (Points Per Reception) leagues using historical player performance data. The project is open-source and customizable, allowing for contributions and modifications to suit various predictive needs. A high-level overview can be found in `main.py`.
 
-This is a work in progress. Better features or indicators should be tried in `feature_engineering.py`. More models can be added to the `models` dictionary in `model_training.py`. The model perfomance will be outputted in the `output` folder.This project is very modularized so building ontop of it should be easy.
+You can customize feature engineering in feature_engineering.py and modify or add new models via the models dictionary in `model_training.py`. All outputs, including model performance analysis, will be saved in the output directory.
 
-## Perfomance
+## Performance Overview
+
+The following results showcase the model's default performance using 2022 data for training and 2023 data for testing (predicted PPR points). You can easily modify these settings in config.py. Data for the specified years will be automatically scraped if it's not already available locally.
 
 ### Cross-Validation RMSE by Model and Position
 
@@ -16,48 +18,54 @@ This is a work in progress. Better features or indicators should be tried in `fe
 
 ## Models
 
-1. **Elastic Net Regularization** - Elastic Net combines both L1 and L2 penalties of Lasso and Ridge, respectively, making it effective for handling datasets with multicollinearity and for selecting correlated features. This hybrid approach balances feature selection and regularization, reducing overfitting while retaining important predictors.
+The following machine learning models are implemented and compared for their ability to predict fantasy football points:
 
-2. **Random Forest Regressor** - An ensemble learning method that constructs multiple decision trees during training and outputs the average prediction of the individual trees. Its ensemble approach enhances robustness and reduces the likelihood of overfitting, making it reliable for datasets with high variance or noise.
+1. **Elastic Net Regularization** - Combines L1 and L2 penalties (Lasso and Ridge), making it effective for handling datasets with multicollinearity. It balances feature selection and regularization, reducing overfitting while retaining important predictors.
 
-3. **Gradient Boosting Regressor** - This model builds an ensemble of weak learners, typically decision trees, sequentially, where each tree corrects the errors of the previous one. It is highly effective for capturing complex, non-linear relationships, often resulting in superior predictive performance on structured data.
+2. **Random Forest Regressor** - An ensemble learning model that creates multiple decision trees during training. It reduces overfitting and enhances robustness, making it effective for handling noisy or high-variance datasets.
 
-4. **CatBoost Regressor** - A gradient boosting algorithm specifically optimized for categorical features, offering excellent performance with minimal hyperparameter tuning. Its ability to handle categorical data natively and its automatic feature combination make it particularly strong in real-world datasets with mixed data types.
+3. **Gradient Boosting Regressor** - Builds an ensemble of weak learners sequentially, with each new learner correcting errors made by previous ones. It captures complex non-linear relationships and often delivers superior performance on structured data.
 
-5. **K-Nearest Neighbors Regressor** - A non-parametric model that predicts the target value based on the average of the nearest k neighbors in the feature space. It is intuitive and effective for capturing local patterns in the data, though its performance can degrade with high-dimensional data or noisy features.
+4. **CatBoost Regressor** - A gradient boosting model optimized for handling categorical features. It delivers strong performance with minimal hyperparameter tuning and automatically combines features for enhanced results on mixed data types.
 
-*Each position has separate groups of models.*
+5. **K-Nearest Neighbors Regressor** - A non-parametric model that predicts the target value based on the average of the nearest k neighbors. It effectively captures local patterns but may struggle with high-dimensional or noisy data.
 
-New models can easily be added and compared by adding them to the models dictionary in `model_training.py/train_model()`. The perfomance will also be outputted in the results csv. New features in the data can be added by adding them in `feature_engineering.py/add_features().`
+*Each position group (e.g., QB, RB, WR) has its own set of models for prediction.*
 
-## Running the Model
+New models can be easily added by updating the models dictionary in `model_training.py`. The performance of any new models will automatically be included in the results CSV and visualized accordingly. Additionally, new features can be incorporated into the dataset by modifying `feature_engineering.py`.
 
-To run the model, first install the required packages:
+## How to Run the Model
 
-```bash
-pip install -r requirements.txt
-```
+1. Install required packages (virtual environment recommended):
 
-Then run the following command:
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-```bash
-python main.py
-```
+2. Run the model:
 
-The model will train and test on the years specified in the `config.py` file. The results will be outputed in the `output` folder with a given timestamp. The results include graphs and information about each models perfomance on the data, in addition to the models themselves.
+    ```bash
+    python main.py
+    ```
 
-Sample output is provided by default in the `output` folder, except the actual models themselves which were omitted due to size.
+The model will train and test using the years specified in the `config.py` file. Output, including performance results, graphs, and trained models, will be saved in the output directory with a timestamp.
 
-## Validation
+Sample output is provided in the output folder, except for the trained models, which are omitted due to file size constraints.
 
-The model is validated using a 5-fold cross-validation. The RMSE is calculated for each fold and then averaged to get the final RMSE for the model. The RMSE is then compared to the other models to see which one performs the best.
+## Model Validation
 
-RMSE is calculated by taking the square root of the average of the squared differences between the predicted and actual values on the training dataset.
+The model is validated using 5-fold cross-validation. RMSE (Root Mean Square Error) is calculated for each fold and averaged to assess the model’s performance. This cross-validation RMSE is then compared across models to identify the best-performing model.
 
-## Data
+RMSE is a measure of prediction accuracy, calculated by taking the square root of the average squared differences between the predicted and actual values.
 
-Data is dynamically scraped for input years from the nfl_data_py package. The data is then cleaned, aggregated, and transformed to be used in the models. Some of the data used is saved to file to act as a local cache in `data/`. This is also for others to use since the data is not easily accessible like college basketball data.
+## Data Collection and Feature Engineering
 
-Feature engineer includes creating rolling averages for each stats for each player over differing timeframes (last game, 4 games, season).
+Data is dynamically scraped for the specified years using the nfl_data_py package. The data is cleaned, aggregated, and transformed for use in the models. Scraped data is cached locally in the `data/` directory for future use, enabling faster re-runs without additional scraping.
 
-Null data is imputed with zeros by default, but this can be tweaked in `model_training.py`.
+### Feature Engineering
+
+Key features are engineered by generating rolling averages for various player statistics (e.g., over the last game, last 4 games, or season). You can modify or extend the feature engineering process in `feature_engineering.py`.
+
+### Handling Missing Data
+
+Missing values are imputed with zeros by default, but this behavior can be customized in `model_training.py`.
