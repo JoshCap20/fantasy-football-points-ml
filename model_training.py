@@ -1,29 +1,36 @@
 """
-Trains model. Core functionality of the project.
+Model Training Module
+
+Core functionality of the project.
+1. Handles null values and generates output directory.
+2. Trains models for each position and saves the results.
+3. Returns model performance results and output directory path.
 
 Extend or tweak models in the models dictionary to experiment.
 """
 
-from sklearn.discriminant_analysis import StandardScaler
-from sklearn.model_selection import GridSearchCV, cross_val_score, KFold
-from sklearn.linear_model import RidgeCV, ElasticNetCV, BayesianRidge, LassoCV
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
-from sklearn.neural_network import MLPRegressor
-from sklearn.metrics import mean_squared_error
-from sklearn.pipeline import make_pipeline
-from sklearn.neighbors import KNeighborsRegressor
-import catboost as cb
-from data_processing import (
-    drop_missing_values,
-    impute_missing_values_with_zero,
-    impute_missing_values_with_median,
-)
-from utils import get_logger
 import pandas as pd
 import numpy as np
 import joblib
 import os
 
+from sklearn.discriminant_analysis import StandardScaler
+from sklearn.model_selection import GridSearchCV, cross_val_score, KFold
+from sklearn.linear_model import ElasticNetCV
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from sklearn.metrics import mean_squared_error
+from sklearn.pipeline import make_pipeline
+from sklearn.neighbors import KNeighborsRegressor
+import catboost as cb
+
+from data_processing import (
+    drop_missing_values,
+    impute_missing_values_with_zero,
+    impute_missing_values_with_median,
+    impute_missing_values_with_mean,
+    impute_missing_values_with_mode,
+)  # Feel free to tweak how null values are handled
+from utils import get_logger
 from config import POSITIONS
 
 
@@ -129,6 +136,7 @@ def train_models_by_position(
 
     logger.debug(f"[{position}] Selected features: {feature_columns}")
 
+    # Add/tweak models here to experiment
     models = {
         # Remove these three prob
         # "Ridge": make_pipeline(

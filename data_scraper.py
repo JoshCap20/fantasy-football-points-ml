@@ -1,7 +1,11 @@
 """
-Simple wrapers for the nfl_data_py package since I hate their names.
+Data Scraper Module
 
+Simple wrapers for the nfl_data_py package since I hate their method names.
+
+TODO: Custom scraper that isn't so ugly.
 TODO: Checks on dataframe to ensure proper values and everything is as expected.
+TODO: Incorporate scoring lines data for O/U, moneyline, and spread predictions.
 """
 
 import nfl_data_py as nfl_data_source

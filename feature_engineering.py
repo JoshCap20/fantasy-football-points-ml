@@ -1,3 +1,20 @@
+"""
+Feature Engineering Module
+
+This module contains functions to engineer features for the model.
+Add new features or modify existing ones in add_features function.
+Change averaging window or add new stats in get_player_averages function.
+
+Functions:
+- get_game_char_indicators: Create one-hot encoding for the opponent and team
+- rolling_average: Calculate rolling average for a given window
+- get_player_averages: Estimate player averages for all stats and fantasy point histories
+- add_features: Engineer features such as interaction, polynomial, and lag features
+- create_feature_columns: Create feature columns for the model
+
+**Be sure not to average target features in get_player_averages function
+"""
+
 import pandas as pd
 from utils import get_logger
 

@@ -1,3 +1,13 @@
+"""
+Analysis Module
+
+Generates performance visualizations.
+
+Mostly GPT-4 generated code with some modifications. I don't like making graphs.
+
+*Someone please improve this.
+"""
+
 import os
 import pandas as pd
 import numpy as np
